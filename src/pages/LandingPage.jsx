@@ -1,0 +1,43 @@
+import React from 'react'
+import "../App.css";
+import mobileImage from "../assets/phone3.png";
+import { Link } from 'react-router-dom';
+import LogoImage from '../assets/logo/vidoralogo1.png';
+
+function LandingPage() {
+  return (
+    <div className='landingPageContainer2'>
+      <nav className='bg-gray-100 shadow-[0_4px_10px_0px_#0000000d]'>
+        <div className='navHeader'>
+            <img
+          className="h-[80px] -ml-[1rem] -my-[1.6rem]"
+          src={LogoImage}
+          alt=""
+        />
+        </div>
+        <div className='navlist'>
+            <p>join as Guest</p>
+            <p>Register</p>
+            <div role='button'>
+                <p>Login</p>
+            </div>
+        </div>
+      </nav>
+
+      <div className="landingMainContainer">
+        <div>
+            <h1><span style={{color:"#ff9839"}}>Connect</span> with your loved Ones</h1>
+            <p>Cover a distance by Vidora</p>
+            <div role='button'>
+                <Link to="/auth">Get Started</Link>
+            </div>
+        </div>
+        <div>
+            <img className='h-[80vh]' src={mobileImage} alt="mobile image" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default LandingPage;

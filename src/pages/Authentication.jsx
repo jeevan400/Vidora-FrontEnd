@@ -45,7 +45,7 @@ export default function Authentication() {
   let handleAuth = async () => {
     try {
       if (formState === 0) {
-        let result = await handleLogin( username, password);
+        let result = await handleLogin(username, password);
       }
       if (formState === 1) {
         let result = await handleRegister(name, username, password);
@@ -91,23 +91,45 @@ export default function Authentication() {
               alignItems: "center",
             }}
           >
-            <Avatar
+            {/* <Avatar
               sx={{ m: 1, bgcolor: "secondary.main", marginBottom: "15px" }}
             >
               <LockOutlinedIcon />
-            </Avatar>
+            </Avatar> */}
 
+            <Avatar
+  sx={{
+    m: 1,
+    bgcolor: "var(--light-primary)",
+color: "var(--primary-color)",
+    width: 50,
+    height: 50,
+    mb: 2
+  }}
+>
+  <LockOutlinedIcon />
+</Avatar>
             <div>
               <Button
                 sx={{ marginRight: "15px" }}
                 variant={formState === 0 ? "contained" : "outlined"}
                 onClick={() => setFormState(0)}
+                style={{
+                 backgroundColor: formState === 0 ? "var(--primary-color)" : "",
+color: formState === 0 ? "white" : "var(--primary-color)",
+borderColor: "var(--primary-color)",
+                }}
               >
                 Sign In
               </Button>
               <Button
                 variant={formState === 1 ? "contained" : "outlined"}
                 onClick={() => setFormState(1)}
+                style={{
+                  backgroundColor: formState === 1 ? "var(--primary-color)" : "",
+color: formState === 1 ? "white" : "var(--primary-color)",
+borderColor: "var(--primary-color)",
+                }}
               >
                 Sign Up
               </Button>
@@ -125,6 +147,16 @@ export default function Authentication() {
                   value={name}
                   autoFocus
                   onChange={(e) => setName(e.target.value)}
+                  sx={{
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused fieldset": {
+      borderColor: "var(--primary-color)",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--primary-color)",
+  },
+}}
                 />
               ) : (
                 <></>
@@ -139,6 +171,16 @@ export default function Authentication() {
                 value={username}
                 autoFocus
                 onChange={(e) => setUsername(e.target.value)}
+                sx={{
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused fieldset": {
+      borderColor: "var(--primary-color)",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--primary-color)",
+  },
+}}
               />
               <TextField
                 margin="normal"
@@ -150,16 +192,32 @@ export default function Authentication() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                sx={{
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused fieldset": {
+      borderColor: "var(--primary-color)",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--primary-color)",
+  },
+}}
               />
 
-              <p style={{ color: "red", fontSize: "12px", fontWeight: "600" }}>
+              <p style={{ color: "var(--error-color)", fontSize: "12px", fontWeight: "600" }}>
                 {error}
               </p>
               <Button
                 type="button"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{
+                  mt: 3, mb: 2,
+    backgroundColor: "var(--primary-color)",
+"&:hover": {
+  backgroundColor: "var(--primary-hover)"
+}
+  }}
                 onClick={handleAuth}
               >
                 {formState === 0 ? "Login" : "Register"}
@@ -168,10 +226,11 @@ export default function Authentication() {
           </Box>
         </Grid>
       </Grid>
-      <Snackbar open={open}
-      autoHideDuration={1000} 
-      message={message}
-      onClose={handleClose}
+      <Snackbar
+        open={open}
+        autoHideDuration={1000}
+        message={message}
+        onClose={handleClose}
       />
     </ThemeProvider>
   );
