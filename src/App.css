@@ -95,6 +95,43 @@ nav .nav-link:hover{
     cursor: pointer;
 }
 
+.landingPageContainer2 nav .navlist .login{
+    background-color: var(--primary-color);
+    color: var(--light-primary);
+    font-weight: 600;
+    padding-inline: 1.3rem;
+    padding-block: 0.5rem;
+    margin-block: -0.4rem;
+    font-size: 1.1rem;
+    border-radius: 0.8rem;
+    box-shadow: 2px 2px 8px #0000003d;
+    transition: all 0.3s ease-in;
+}
+
+.landingPageContainer2 nav .navlist .login:hover{
+    box-shadow: 2px 2px 8px #0000005d;
+    background-color: var(--primary-hover);
+}
+
+.landingPageContainer2 nav .navlist > p{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     font-weight: 600;
+    padding-inline: 1.3rem;
+    padding-block: 0.5rem;
+    margin-block: -0.4rem;
+    font-size: 1.1rem;
+    border-radius: 0.8rem;
+    box-shadow: 2px 2px 8px #0000001d;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    transition: all 0.3s ease-in;
+}
+
+.landingPageContainer2 nav .navlist > p:hover{
+    background-color: var(--light-primary);
+}
 .landingMainContainer{
     display: flex;
     justify-content: space-between;
