@@ -25,9 +25,13 @@ function LandingPage() {
       </nav>
 
       <div className="landingMainContainer">
-        <div>
-            <h1><span style={{color:"#ff9839"}}>Connect</span> with your loved Ones</h1>
+        <div className='max-w-[70%]'>
+          <h1 className="main-heading"> <span className='logoname'>Vidora </span> - Where Conversations Come Alive </h1>
+            <h1 className='sub-heading'>Connect with your loved Ones</h1>
             <p>Cover a distance by Vidora</p>
+            <p>Vidora brings people together through smooth video communication,
+            real-time messaging, and effortless screen sharing — making every
+            conversation more immersive, interactive, and impactful.</p>
             <div role='button'>
                 <Link to="/auth">Get Started</Link>
             </div>

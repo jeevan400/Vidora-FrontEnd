@@ -103,7 +103,14 @@ nav .nav-link:hover{
     align-items: center;
 }
 
-.landingMainContainer > div:nth-child(1) h1{
+.landingMainContainer .main-heading{
+    font-size: 2.6rem;
+    font-weight: 500;
+}
+.landingMainContainer .main-heading .logoname{
+    color: var(--primary-color);
+}
+.landingMainContainer > div:nth-child(1) .sub-heading{
     font-size: 2.2rem;
 }
 
