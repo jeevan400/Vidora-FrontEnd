@@ -94,7 +94,74 @@ function VideoMeetComponent() {
     getPermissions();
   }, []);
 
-  let getUserMediaSuccess = (stream) => {};
+  let getUserMediaSuccess = (stream) => {
+    try{
+      window.localStream.getTracks().forEach( track => track.stop());
+    } catch(e){
+      console.log(e);
+    }
+
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
+
+    for( let id in connections){
+      if(id === socketIdRef.current) continue;
+
+      connections[id].addStream(window.localStream)
+
+      connections[id].createOffer().then((description)=>{
+        connections[id].setLocalDescription(description).then(()=>{
+          socketIdRef.current.emit("signal", id, JSON.stringify({"sdp": connections[id].localDescription}))
+        })
+        .catch(e => console.log(e));
+      })
+    }
+
+    stream.getTracks().forEach(track => track.onended = ()=>{
+      setVideo(false)
+      setAudio(false);
+
+      try{
+        let tracks = localVideoRef.current.srcObject.getTracks();
+        tracks.forEach(track => track.stop())
+      } catch (e) { console.log(e) }
+
+      // TODO BlackSilence
+      let blackSilence = (...args) => new MediaStream([black(...args), silence()]);
+            window.localStream = blackSilence();
+            localVideoRef.current.srcObject = window.localStream;
+
+      for (let id in connections){
+        connections[id].addStream(window.localStream)
+        connections[id].createOffer().then((description)=>{
+          connections[id].setLocalDescription(description)
+          .then(()=>{
+            socketRef.current.emit("signal", id, JSON.stringify({"sdp":connections[id].localDescription}))
+          }).catch(e => console.log(e));
+        })
+      }
+      
+    })
+  };
+
+  let silence = ()=>{
+    let ctx = new AudioContext();
+    let oscillator = ctx.createOscillator();
+
+    let dst = oscillator.connect(ctx.createMediaStreamDestination());
+
+    oscillator.start();
+    ctx.resume()
+    return Object.assign(dst.stream.getAudioTracks()[0], { enabled: false})
+  }
+
+  let black = ({ width = 640, height = 480} = {})=>{
+    let canvas = Object.assign(document.createElement("canvas"), {width, height});
+
+    canvas.getContext("2d").fillRect(0, 0, width, height);
+    let stream = canvas.captureStream();
+    return Object.assign(stream.getVideoTracks()[0], {enabled: false})
+  }
 
   // if any changes in the audio and video then it run means when audio and video on or off then it is run
   // Function to start or stop user media ( camera / micraophone)
@@ -125,7 +192,48 @@ function VideoMeetComponent() {
 
   // Function that will handle signaling messages coming from the server
   // These messages are used to establish webRTC connections (offer, answers, ICE candidates)
-  let gotMesssageFromServer = (fromId, message) => {};
+  // This function is called whenever we receive a signaling message
+  // from the socket server (offer / answer/ ICE candidate)
+  let gotMesssageFromServer = (fromId, message) => {
+    // Conver the incoming string message into a javaScript object
+    let signal = JSON.parse(message);
+
+    // Ignore messages that come from our own socket
+    if(fromId !== socketIdRef.current){
+
+      // If the message contains SDP (offer or answer)
+      if(signal.sdp){
+
+        // Set the received SDP as the remote description
+        // This tells our peer connection what the other peer supports
+        connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(()=>{
+
+          // If the received SDP type is "offer" then we need to generate an answer
+          if(signal.sdp.type === "offer"){
+
+            // create an SDP answer
+            connections[fromId].createAnswer().then((description)=>{
+
+              // set the genrated answer as the local description
+              connections[fromId].setLocalDescription(description).then(()=>{
+
+                // Send the answer back to the remote peer through the socket signaling server
+                socketIdRef.current.emit("signal", fromId, JSON.stringify({"sdp": connections[fromId].localDescription}))
+              }).catch(e => console.log(e));
+            }).catch(e => console.log(e))
+          }
+        }).catch(e => console.log(e));
+      }
+
+      // if the message contains ICE candidate
+      if(signal.ice){
+
+        // Add the ICE candidate to the peer connection
+        // This helps in finding the best network route
+        connections[fromId].addIceCandidate(new RTCIceCandidate(signal.ice)).catch(e => console.log(e));
+      }
+    }
+  };
 
   // Function that will add chat messages to the chat UI
   // This runs whenever a chat message event is received
@@ -142,7 +250,6 @@ function VideoMeetComponent() {
 
     // This runs when the socket connection is successfully established
     socketRef.current.on("connect", () => {
-
       //Inform the server that this user wants to join a call room
       // window.location.href is being used as the meeting room ID
       socketRef.current.emit("join-call", window.location.href);
@@ -155,7 +262,6 @@ function VideoMeetComponent() {
 
       // Event triggered when a user leaves the meeting
       socketRef.current.on("user-left", (id) => {
-
         // Remove that user's video from the video list
         setVideo((videos) => videos.filter((video) => video.socketId !== id));
       });
@@ -172,7 +278,6 @@ function VideoMeetComponent() {
           // ICE candidates help find the best network path between users
           connections[socketListId].onicecandidate = (event) => {
             if (event.candidate !== null) {
-
               // Send the ICE candidate to the other user through the socket server
               socketRef.current.emit(
                 "signal",
@@ -191,7 +296,6 @@ function VideoMeetComponent() {
 
             // if the video already exists
             if (videoExists) {
-              
               // Update the existing video stream
               setVideo((videos) => {
                 const updatedVideos = videos.map((video) =>
@@ -220,7 +324,57 @@ function VideoMeetComponent() {
               });
             }
           };
+
+          // Check if local camera/microphone stream is available
+          if (window.localStream !== undefined && window.localStream !== null) {
+            //Add local media stram to the peer connection
+            // This allows sending out camera/mic stram to the remote user
+            connections[socketId].addStream(window.localStream);
+          } else {
+            //Black silence
+            // if no media stram is available
+            // we will send an empty (black/silent) stream
+
+            let blackSilence = (...args) => new MediaStream([black(...args), silence()]);
+            window.localStream = blackSilence();
+            connections[socketListId].addStream(window.localStream);
+          }
         });
+
+        // check if the current socket id belongs to this user
+        if (id === socketIdRef.current) {
+          // Loop through all existing peer connections
+          for (let id2 in connections) {
+            // Skip if the connection belongs to the current user
+            if (id2 === socketIdRef.current) continue;
+
+            try {
+              // Add local stream to the peer connection
+              // so the remote user can receive our video/ audio
+              connections[id2].addStream(window.localStream);
+            } catch (e) {
+              // log any error that occurs while adding stream
+              console.log(e);
+            }
+
+            // Create webRTC offer for starting the connection
+            connections[id2].createOffer().then((description) => {
+              // Set the created offer as the local description
+              connections[id2]
+                .setLocalDescription(description)
+                .then(() => {
+                  // Send the offer (SDP) to the remote peer through socket server
+                  socketRef.current.emit(
+                    "signal",
+                    id2,
+                    JSON.stringify({ sdp: connections[id2].localDescription }),
+                  );
+                })
+                // Catch any error while setting local description
+                .catch((e) => console.log(e));
+            });
+          }
+        }
       });
     });
   };
@@ -265,7 +419,16 @@ function VideoMeetComponent() {
           </div>
         </div>
       ) : (
-        <></>
+        <>
+          <video ref={localVideoRef} autoPlay muted></video>
+          {
+            videos.map((video)=>(
+              <div className="h-[100px] w-[200px] bg-red-500 rounded-lg" key={video.socketId}>
+
+              </div>
+            ))
+          }
+        </>
       )}
     </div>
   );

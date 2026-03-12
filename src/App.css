@@ -71,6 +71,7 @@ nav .nav-link:hover{
     width: 100vw;
     height: 100vh;
     background-color: var(--background-color);
+    overflow-y: auto;
     /* background: url("./assets/background5.jpg");
     background-repeat: no-repeat;
     background-size: cover;
@@ -82,6 +83,8 @@ nav .nav-link:hover{
     padding-block: 1.6rem;
     display: flex;
     justify-content: space-between;
+    position: sticky;
+    top: 0rem;
 }
 
 .landingPageContainer2 nav h2{
@@ -92,7 +95,6 @@ nav .nav-link:hover{
 .landingPageContainer2 nav .navlist{
     display: flex;
     gap: 1.6rem;
-    cursor: pointer;
 }
 
 .landingPageContainer2 nav .navlist .login{
@@ -127,11 +129,30 @@ nav .nav-link:hover{
     border: 1px solid var(--primary-color);
     color: var(--primary-color);
     transition: all 0.3s ease-in;
+    cursor: pointer;
+
 }
 
 .landingPageContainer2 nav .navlist > p:hover{
     background-color: var(--light-primary);
 }
+
+.landingPageContainer2 nav .navlist .menu{
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+@media(max-width:800px){
+    .landingPageContainer2 nav .navlist .nav-tab{
+        display: none;
+    }
+}
+@media(min-width:800px){
+     .landingPageContainer2 nav .navlist .menu{
+        display: none;
+    }
+}
+
 .landingMainContainer{
     display: flex;
     justify-content: space-between;
@@ -142,7 +163,7 @@ nav .nav-link:hover{
 
 .landingMainContainer .main-heading{
     font-size: 2.6rem;
-    font-weight: 500;
+    font-weight: 800;
 }
 .landingMainContainer .main-heading .logoname{
     color: var(--primary-color);
@@ -171,6 +192,35 @@ nav .nav-link:hover{
     width: auto;
 }
 
+@media(max-width:860px){
+    .landingMainContainer > div:nth-child(2){
+        display: none;
+    }
+}
+@media(max-width:590px){
+    .landingMainContainer >div:nth-child(1){
+        margin-top: 30px;
+        overflow-y: auto;
+    }
+    .landingMainContainer{
+        padding-inline: 10px;
+    }
+}
+
+@media(max-width:500px){
+    .landingMainContainer .main-heading{
+        font-size: 2rem;
+        text-align: justify;
+    }
+    .landingMainContainer > div:nth-child(1) .sub-heading{
+        font-size: 1.6rem;
+        font-weight: 600;
+        text-align: justify;
+    }
+    .landingMainContainer > div:nth-child(1) p{
+        text-align: justify;
+    }
+}
 .landingMainContainer > div:nth-child(1) div[role='button']:hover{
     background-color: var(--primary-hover);
 }
