@@ -57,7 +57,7 @@ nav .nav-link:hover{
     background-position: center top;
 } */
 
-:root {
+/* :root {
   --primary-color: #ff9839;
   --primary-hover: #ff7f1a;
   --light-primary: #fff3e8;
@@ -65,13 +65,34 @@ nav .nav-link:hover{
   --background-color: #f5f5f5;
   --text-primary: #333333;
   --error-color: #ef4444;
+} */
+
+:root {
+  /* --- Primary Brand Colors --- */
+  --primary-color: #6366f1;       /* Buttons, Active States, Logo */
+  --primary-hover: #4f46e5;       /* Button Hover state */
+  --light-primary: #eef2ff;       /* Selected items background, Chat bubble tint */
+  
+  /* --- Neutral Backgrounds --- */
+  --background-color: #ffffff;    /* Main Body Background */
+  --surface-color: #f8fafc;       /* Cards, Sidebar, Input fields background */
+  
+  /* --- Text & Borders --- */
+  --text-primary: #1e293b;        /* Headlines, Main content text */
+  --text-secondary: #64748b;      /* Placeholder text, Subtitles, Dates */
+  --border-color: #e2e8f0;        /* Divider lines, Input borders */
+  
+  /* --- Feedback & Status --- */
+  --error-color: #ef4444;         /* Error messages, 'Leave Call' button */
+  --success-color: #10b981;       /* Online status, Success toast */
+  --active-speaker: #818cf8;      /* Glowing border around the talking person's video */
 }
 
 .landingPageContainer2{
     width: 100vw;
     height: 100vh;
-    background-color: var(--background-color);
-    overflow-y: auto;
+    background-color: var(--light-primary);
+    /* overflow-y: auto; */
     /* background: url("./assets/background5.jpg");
     background-repeat: no-repeat;
     background-size: cover;
@@ -85,6 +106,7 @@ nav .nav-link:hover{
     justify-content: space-between;
     position: sticky;
     top: 0rem;
+    padding-inline: 3rem;
 }
 
 .landingPageContainer2 nav h2{
@@ -159,6 +181,7 @@ nav .nav-link:hover{
     padding-inline: 3rem;
     height: 80vh;
     align-items: center;
+    gap: 10px;
 }
 
 .landingMainContainer .main-heading{
@@ -173,10 +196,12 @@ nav .nav-link:hover{
 }
 
 .landingMainContainer > div:nth-child(1) div[role='button']{
-    background-color: var(--primary-color);
+    /* background-color: var(--primary-color); */
+    background: linear-gradient(var(--primary-color), var(--primary-hover));
     width: fit-content;
-    padding: 1rem;
-    border-radius: 20px;
+    padding-inline: 2rem;
+    padding-block: 0.5rem;
+    border-radius: 10px;
     margin-top: 1.9rem;
     transition: all 0.3s ease-in;
 }
@@ -184,7 +209,7 @@ nav .nav-link:hover{
 .landingMainContainer > div:nth-child(1) div[role='button'] a{
     text-decoration: none;
     color: var(--light-primary);
-    font-size: 1.7rem;
+    font-size: 1.4rem;
 }
 
 .landingMainContainer > div:nth-child(2){
@@ -192,6 +217,12 @@ nav .nav-link:hover{
     width: auto;
 }
 
+.landingMainContainer .mainImage img{
+    height: 75vh;
+    border-radius: 20px;
+    /* border:2px solid var(--primary-color); */
+    box-shadow: 0px 0px 10px #0000003d;
+}
 @media(max-width:860px){
     .landingMainContainer > div:nth-child(2){
         display: none;
@@ -223,4 +254,5 @@ nav .nav-link:hover{
 }
 .landingMainContainer > div:nth-child(1) div[role='button']:hover{
     background-color: var(--primary-hover);
+    box-shadow: 2px 2px 20px #0000003d;
 }

@@ -98,26 +98,27 @@ export default function Authentication() {
             </Avatar> */}
 
             <Avatar
-  sx={{
-    m: 1,
-    bgcolor: "var(--light-primary)",
-color: "var(--primary-color)",
-    width: 50,
-    height: 50,
-    mb: 2
-  }}
->
-  <LockOutlinedIcon />
-</Avatar>
+              sx={{
+                m: 1,
+                bgcolor: "var(--light-primary)",
+                color: "var(--primary-color)",
+                width: 50,
+                height: 50,
+                mb: 2,
+              }}
+            >
+              <LockOutlinedIcon />
+            </Avatar>
             <div>
               <Button
                 sx={{ marginRight: "15px" }}
                 variant={formState === 0 ? "contained" : "outlined"}
                 onClick={() => setFormState(0)}
                 style={{
-                 backgroundColor: formState === 0 ? "var(--primary-color)" : "",
-color: formState === 0 ? "white" : "var(--primary-color)",
-borderColor: "var(--primary-color)",
+                  backgroundColor:
+                    formState === 0 ? "var(--primary-color)" : "",
+                  color: formState === 0 ? "white" : "var(--primary-color)",
+                  borderColor: "var(--primary-color)",
                 }}
               >
                 Sign In
@@ -126,9 +127,10 @@ borderColor: "var(--primary-color)",
                 variant={formState === 1 ? "contained" : "outlined"}
                 onClick={() => setFormState(1)}
                 style={{
-                  backgroundColor: formState === 1 ? "var(--primary-color)" : "",
-color: formState === 1 ? "white" : "var(--primary-color)",
-borderColor: "var(--primary-color)",
+                  backgroundColor:
+                    formState === 1 ? "var(--primary-color)" : "",
+                  color: formState === 1 ? "white" : "var(--primary-color)",
+                  borderColor: "var(--primary-color)",
                 }}
               >
                 Sign Up
@@ -148,15 +150,15 @@ borderColor: "var(--primary-color)",
                   autoFocus
                   onChange={(e) => setName(e.target.value)}
                   sx={{
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": {
-      borderColor: "var(--primary-color)",
-    },
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "var(--primary-color)",
-  },
-}}
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused fieldset": {
+                        borderColor: "var(--primary-color)",
+                      },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "var(--primary-color)",
+                    },
+                  }}
                 />
               ) : (
                 <></>
@@ -172,15 +174,15 @@ borderColor: "var(--primary-color)",
                 autoFocus
                 onChange={(e) => setUsername(e.target.value)}
                 sx={{
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": {
-      borderColor: "var(--primary-color)",
-    },
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "var(--primary-color)",
-  },
-}}
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--primary-color)",
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--primary-color)",
+                  },
+                }}
               />
               <TextField
                 margin="normal"
@@ -193,18 +195,24 @@ borderColor: "var(--primary-color)",
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 sx={{
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": {
-      borderColor: "var(--primary-color)",
-    },
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "var(--primary-color)",
-  },
-}}
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "var(--primary-color)",
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--primary-color)",
+                  },
+                }}
               />
 
-              <p style={{ color: "var(--error-color)", fontSize: "12px", fontWeight: "600" }}>
+              <p
+                style={{
+                  color: "var(--error-color)",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                }}
+              >
                 {error}
               </p>
               <Button
@@ -212,12 +220,14 @@ borderColor: "var(--primary-color)",
                 fullWidth
                 variant="contained"
                 sx={{
-                  mt: 3, mb: 2,
-    backgroundColor: "var(--primary-color)",
-"&:hover": {
-  backgroundColor: "var(--primary-hover)"
-}
-  }}
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: "var(--primary-color)",
+                  "&:hover": {
+                    backgroundColor: "var(--primary-hover)",
+                  },
+                  paddingBlock:"10px"
+                }}
                 onClick={handleAuth}
               >
                 {formState === 0 ? "Login" : "Register"}

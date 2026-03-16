@@ -13,6 +13,9 @@ import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import Badge from "@mui/material/Badge";
 import ChatIcon from "@mui/icons-material/Chat";
+import vIcon from "../assets/vidoraImages/V_icon.png";
+import SendIcon from "@mui/icons-material/Send";
+
 const server_url = import.meta.env.VITE_SERVER_URL;
 
 let connections = {};
@@ -36,12 +39,12 @@ function VideoMeetComponent() {
   let [audio, setAudio] = useState();
 
   let [screen, setScreen] = useState();
-  let [showModal, setShowModal] = useState();
+  let [showModal, setShowModal] = useState(false);
   let [screenAvailable, setScreenAvailable] = useState();
 
   let [messages, setMessages] = useState([]);
   let [message, setMessage] = useState("");
-  let [newMessages, setNewMessages] = useState(6);
+  let [newMessages, setNewMessages] = useState(0);
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
 
@@ -278,7 +281,16 @@ function VideoMeetComponent() {
 
   // Function that will add chat messages to the chat UI
   // This runs whenever a chat message event is received
-  let addMessage = () => {};
+  let addMessage = (data, sender, socketIdSender) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: sender, data: data },
+    ]);
+
+    if (socketIdSender !== socketIdRef.current) {
+      setNewMessages((prevMessages) => prevMessages + 1);
+    }
+  };
 
   // Function used to connect the client to the socket signaling server
   let connectToSocketServer = () => {
@@ -448,26 +460,169 @@ function VideoMeetComponent() {
   const handleAudio = () => {
     setAudio(!audio);
   };
+
+  let getDisplayMediaSuccess = (stream) => {
+    try {
+      window.localStream.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
+
+    for (let id in connections) {
+      if (id === socketIdRef.current) continue;
+
+      connections[id].addStream(window.localStream);
+      connections[id].createOffer().then((description) => {
+        connections[id]
+          .setLocalDescription(description)
+          .then(() => {
+            socketRef.current.emit(
+              "signal",
+              id,
+              JSON.stringify({ sdp: connections[id].localDescription }),
+            );
+          })
+          .catch((e) => console.log(e));
+      });
+    }
+
+    stream.getTracks().forEach(
+      (track) =>
+        (track.onended = () => {
+          setScreen(false);
+
+          try {
+            let tracks = localVideoVRef.current.srcObject.getTracks();
+            tracks.forEach((track) => track.stop());
+          } catch (e) {
+            console.log(e);
+          }
+
+          // TODO BlackSilence
+          let blackSilence = (...args) =>
+            new MediaStream([black(...args), silence()]);
+          window.localStream = blackSilence();
+          localVideoRef.current.srcObject = window.localStream;
+
+          getUserMedia();
+        }),
+    );
+  };
+
+  let getDisplayMedia = () => {
+    if (screen) {
+      if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices
+          .getDisplayMedia({ video: true, audio: true })
+          .then(getDisplayMediaSuccess)
+          .then((stream) => {})
+          .catch((e) => console.log(e));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (screen !== undefined) {
+      getDisplayMedia();
+    }
+  }, [screen]);
+
+  let handleScreen = () => {
+    setScreen(!screen);
+  };
+
+  let handleChatBox = () => {
+    setShowModal(!showModal);
+  };
+
+  let sendMessage = () => {
+    socketRef.current.emit("chat-message", message, username);
+    setMessage("");
+  };
   return (
     <div>
       {askForUsername === true ? (
-        <div>
-          <h1>Enter into Lobby</h1>
-          {username}
-          <TextField
-            id="outlined-basic"
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            variant="outlined"
-          />
+        <div className={styles.lobbyContainer}>
+          <div className={styles.lobbyForm}>
+            <div className={styles.formContent}>
+              <div className={styles.logoImage}>
+                <h1>Welcome to</h1>
+                <div className="flex justify-center items-center">
+                  <img src={vIcon} alt="logo" />
+                  <h1>idora</h1>
+                </div>
+              </div>
+              <TextField
+                className={styles.formTextField}
+                id="filled-basic"
+                label="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                variant="filled"
+                sx={{
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "var(--primary-color)",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "1px solid var(--primary-color)",
+                  },
+                }}
+              />
+              <div className={styles.formMainContent}>
+                <h2>Enter the Meeting Room</h2>
+                <p>
+                  Join the meeting and start seamless communication in seconds.
+                </p>
+              </div>
+            </div>
+            <Button
+              className={styles.lobbyFormButton}
+              variant="contained"
+              onClick={connect}
+            >
+              Connect
+            </Button>
+          </div>
 
-          <Button variant="contained" onClick={connect}>
-            Connect
-          </Button>
-
-          <div>
+          <div className={styles.lobbyStream}>
             <video ref={localVideoRef} autoPlay muted></video>
+            <div className="w-[97%] h-[90%] absolute top-4 left-4 flex flex-col justify-start gap-2">
+              <div className="bg-[#4f46e54d] w-fit px-4 py-2 rounded-lg border border-indigo-500 shadow-[0_0_20px_#4f46e56d] text-white font-light  ">
+                <h1 className="text-[16px] font-bold">Audio</h1>
+                <p className="text-[12px] font-light">
+                  Clear and smooth voice communication.
+                </p>
+              </div>
+              <div className="bg-[#4f46e54d] w-fit px-4 py-2 rounded-lg border border-indigo-500 shadow-[0_0_20px_#4f46e56d] text-white font-light ">
+                <h1 className="text-[16px] font-bold">Video</h1>
+                <p className="text-[12px] font-light">
+                  Connect face-to-face with live video.
+                </p>
+              </div>
+              <div className="absolute top-4 right-6">
+                <img
+                  className="h-8 w-8 rounded-full border border-indigo-500"
+                  src={vIcon}
+                  alt="logo"
+                />
+              </div>
+              <div className="w-fit px-4 py-2 bg-[#4f46e54d] rounded-lg text-white  border border-indigo-500 shadow-[0_0_20px_#4f46e56d]">
+                <h1 className="text-[16px] font-bold">Chat</h1>
+                <p className="text-[12px] font-light">
+                  Send quick messages during the meeting
+                </p>
+              </div>
+              <div className="w-fit px-4 py-2 bg-[#4f46e54d] rounded-lg text-white border border-indigo-500 shadow-[0_0_20px_#4f46e56d]">
+                <h1 className="text-[16px] font-bold">Screen Share</h1>
+                <p className="text-[12px] font-light">
+                  Share your screen for easy collaboration.
+                </p>
+              </div>
+            </div>
+            <div></div>
           </div>
         </div>
       ) : (
@@ -479,12 +634,12 @@ function VideoMeetComponent() {
             muted
           ></video>
           {/* {styles.conferenceView} */}
-          <div className={styles.conferenceView} >
-          {videos.map((video) => (
+          <div className={styles.conferenceView}>
+            {videos.map((video) => (
               <video
-              // {styles.conferenceUsers}
-              key={video.socketId}
-              className={styles.conferenceUsers}
+                // {styles.conferenceUsers}
+                key={video.socketId}
+                className={styles.conferenceUsers}
                 data-socket={video.socketId}
                 ref={(ref) => {
                   if (ref && video.stream) {
@@ -493,36 +648,95 @@ function VideoMeetComponent() {
                 }}
                 autoPlay
               ></video>
-          ))}
+            ))}
           </div>
           <div className={styles.buttonContainer}>
-            <IconButton onClick={handleVideo}>
-              {video === true ? <VideocamIcon /> : <VideocamoffIcon />}
-            </IconButton>
-            <IconButton >
-              <CallEndIcon style={{ color: "red" }} />
-            </IconButton>
-            <IconButton onClick={handleAudio}>
-              {audio === true ? <MicIcon /> : <MicOffIcon />}
-            </IconButton>
-            {screenAvailable === true ? (
-              <IconButton>
-                {screen === true ? (
-                  <ScreenShareIcon />
+            <div className="bg-white/20 px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-4">
+              <IconButton onClick={handleVideo}>
+                {video === true ? (
+                  <VideocamIcon style={{ color: "var(--primary-hover)" }} />
                 ) : (
-                  <StopScreenShareIcon />
+                  <VideocamoffIcon />
                 )}
               </IconButton>
-            ) : (
-              <></>
-            )}
-
-            <Badge badgeContent={newMessages} max={999} color="secondary">
               <IconButton>
-                <ChatIcon />
+                <CallEndIcon style={{ color: "red" }} />
               </IconButton>
-            </Badge>
+              <IconButton onClick={handleAudio}>
+                {audio === true ? (
+                  <MicIcon style={{ color: "var(--primary-hover)" }} />
+                ) : (
+                  <MicOffIcon />
+                )}
+              </IconButton>
+              {screenAvailable === true ? (
+                <IconButton onClick={handleScreen}>
+                  {screen === true ? (
+                    <ScreenShareIcon
+                      style={{ color: "var(--primary-hover)" }}
+                    />
+                  ) : (
+                    <StopScreenShareIcon />
+                  )}
+                </IconButton>
+              ) : (
+                <></>
+              )}
+              <Badge badgeContent={newMessages} max={999} color="secondary">
+                <IconButton onClick={handleChatBox}>
+                  {showModal ? (
+                    <ChatIcon style={{ color: "var(--primary-hover)" }} />
+                  ) : (
+                    <ChatIcon />
+                  )}
+                </IconButton>
+              </Badge>
+            </div>
           </div>
+          {showModal ? (
+            <div className={styles.chatRoom}>
+              <h1 className="flex justify-center items-center bg-white w-fit px-4 py-1 rounded-full">
+                <img className="h-8 w-8 rounded-full" src={vIcon} alt="logo" />
+                <span className="text-[18px] text-[#060606] font-bold">
+                  idora Chat
+                </span>
+              </h1>
+              <div className={styles.chatBox}>
+                {messages.length > 0 ? (
+                  messages.map((item, index) => {
+                    return (
+                      <div className="w-fit bg-[var(--primary-color)] px-4 py-2 rounded-tl-[30px] rounded-tr-[30px] rounded-br-[30px] rounded-bl-[10px]" key={index}>
+                        <p className="text-[16px] text-[#ffffff] font-extrabold ">{item.sender}</p>
+                        <p className="text-[14px] text-[#ffffff] font-medium">{item.data}</p>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="">No messages Yet.</div>
+                )}
+              </div>
+              <div className={styles.chatInput}>
+                <input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  type="text"
+                />
+                <IconButton
+                  onClick={sendMessage}
+                  style={{
+                    backgroundColor: "var(--primary-hover)",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <SendIcon style={{ color: "white" }} />
+                </IconButton>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       )}
     </div>
