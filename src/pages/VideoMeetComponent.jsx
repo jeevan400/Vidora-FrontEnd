@@ -73,7 +73,6 @@ function VideoMeetComponent() {
 
       if (audioPetmission) {
         setAudioAvailable(true);
-        console.log("this is my server url ", server_url);
       } else {
         setAudioAvailable(false);
       }
@@ -124,7 +123,6 @@ function VideoMeetComponent() {
       connections[id].addStream(window.localStream);
 
       connections[id].createOffer().then((description) => {
-        console.log(description);
         connections[id]
           .setLocalDescription(description)
           .then(() => {
@@ -206,7 +204,6 @@ function VideoMeetComponent() {
         .then(getUserMediaSuccess)
         .then((stream) => {})
         .catch((err) => console.log(err));
-      found;
     } else {
       try {
         let tracks = localVideoRef.current.srcObject.getTracks();
@@ -403,30 +400,21 @@ function VideoMeetComponent() {
       });
     });
 
-    // Event triggered when a user leaves the meeting
     socketRef.current.on("user-left", (id) => {
-      console.log("USER LEFT EVENT RECEIVED: ", id);
       toast.success("User left the call!");
-      // Remove that user's video from the video list
       setVideos((videos) => videos.filter((video) => video.socketId !== id));
     });
   };
 
-  // Function used to enable camera and microphone
   let getMedia = () => {
-    // Set Video state depending on whether camera is available
     setVideo(videoAvailable);
-    // Set audio state depending on whether microphone is available
     setAudio(audioAvailable);
   };
 
   // Function that runs when the user clicks the "Connect" button
   let connect = () => {
-    // Hide the username input screen
     setAskForUsername(false);
-    // Enable camera and microphone
     getMedia();
-    //Connect to the socket signalin server
     connectToSocketServer();
   };
 
@@ -547,10 +535,8 @@ function VideoMeetComponent() {
   let handleStartEdit = (id) => {
     setIsEdit(true);
     const selectedMessage = messages.find((item) => item.msg_id === id);
-    // console.log(selectedMessage);
     if (selectedMessage) {
       setMessage(selectedMessage.data);
-      // console.log(selectedMessage.msg_id);
       setUpdatedMessageId(selectedMessage.msg_id);
     }
   };
@@ -575,7 +561,6 @@ function VideoMeetComponent() {
   // handle delete message
   let handleDeleteMessage = (id) => {
     console.log("message deleted successfully");
-    // setMessages(messages.filter((item) => id !== item.msg_id));
     socketRef.current.emit("delete-message", {
       id: id,
       socketId: socketIdRef.current,
