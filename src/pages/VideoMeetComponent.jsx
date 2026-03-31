@@ -3,7 +3,7 @@ import styles from "../styles/videoComponent.module.css";
 import io from "socket.io-client";
 import IconButton from "@mui/material/IconButton";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import VideocamoffIcon from "@mui/icons-material/Videocamoff";
+import VideocamoffIcon from "@mui/icons-material/VideocamOff";
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
