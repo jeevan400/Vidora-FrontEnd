@@ -2,8 +2,8 @@ import * as React from "react";
 import { AuthContext } from "../context/AuthContext";
 import Snackbar from "@mui/material/Snackbar";
 import { useNavigate } from "react-router-dom";
-import LogoImage from "../assets/vidoraImages/vidoraMainLogo.png";
-import { Video, Users, Monitor, Shield, ArrowRight } from "lucide-react";
+import LogoImage from "../assets/vidoraImages/vidoraLogoImage.png";
+import { Video, Users, Monitor, MessageSquare, ArrowRight } from "lucide-react";
 
 export default function Authentication() {
   const [username, setUsername] = React.useState("");
@@ -47,20 +47,32 @@ export default function Authentication() {
   };
 
   const features = [
-    { icon: <Video size={16} />, text: "HD video calls, crystal clear" },
-    { icon: <Users size={16} />, text: "Group meetings up to 100 people" },
-    { icon: <Monitor size={16} />, text: "One-click screen sharing" },
-    { icon: <Shield size={16} />, text: "End-to-end encrypted by default" },
+    {
+      icon: <Video size={16} />,
+      text: "Make HD video calls (quality depends on your camera).",
+    },
+    {
+      icon: <Users size={16} />,
+      text: "Up to 4 people can join at the same time.",
+    },
+    {
+      icon: <Monitor size={16} />,
+      text: "Share your screen live during calls for learning, meetings, or explaining things.",
+    },
+    {
+      icon: <MessageSquare size={16} />,
+      text: "Send messages in real time. You can edit and reply to messages easily.",
+    },
   ];
 
   return (
     <div className="min-h-screen flex font-sans">
       {/* ── Left Panel — Brand ── */}
-      <div className="hidden lg:flex w-[52%] relative flex-col justify-between p-12 overflow-hidden bg-gray-900">
+      <div className="hidden lg:flex w-[52%] relative flex-col justify-between p-12 overflow-hidden bg-[var(--light-primary)]">
         {/* Gradient blobs */}
         <div className="absolute top-[-80px] left-[-60px] w-[340px] h-[340px] rounded-full bg-[#4F84F6]/20 blur-[90px] pointer-events-none" />
-        <div className="absolute bottom-[-60px] right-[-40px] w-[280px] h-[280px] rounded-full bg-[#5D58E0]/20 blur-[80px] pointer-events-none" />
-        <div className="absolute top-[45%] right-[10%] w-[180px] h-[180px] rounded-full bg-[#4F84F6]/10 blur-[60px] pointer-events-none" />
+        <div className="absolute bottom-[-60px] right-[-40px] w-[280px] h-[280px] rounded-full bg-[#4F84F6]/20 blur-[80px] pointer-events-none" />
+        <div className="absolute top-[45%] right-[10%] w-[180px] h-[180px] rounded-full bg-[#a78bfa]/10 blur-[60px] pointer-events-none" />
 
         {/* Subtle grid overlay */}
         <div
@@ -72,25 +84,9 @@ export default function Authentication() {
           }}
         />
 
-        {/* Top: Logo */}
-        <div className="relative z-10">
-          <img
-            src={LogoImage}
-            alt="Vidora"
-            className="h-[36px] brightness-[10] opacity-90"
-          />
-        </div>
-
         {/* Middle: Headline */}
         <div className="relative z-10 flex flex-col gap-6">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-xs font-medium text-blue-400 tracking-widest uppercase">
-              Trusted by 12,000+ teams
-            </span>
-          </div>
-
-          <h2 className="text-4xl font-extrabold text-white leading-[1.2] tracking-tight">
+          <h2 className="text-4xl font-extrabold text-[var(--text-primary)] leading-[1.2] tracking-tight">
             Meet, connect, and{" "}
             <span className="bg-gradient-to-r from-[#4F84F6] to-[#a78bfa] bg-clip-text text-transparent">
               collaborate
@@ -98,7 +94,7 @@ export default function Authentication() {
             without limits.
           </h2>
 
-          <p className="text-gray-400 text-[0.95rem] leading-relaxed max-w-sm">
+          <p className="text-[var(--text-secondary)] text-[0.95rem] leading-relaxed max-w-sm">
             Vidora gives your team a single place for video meetings, real-time
             chat, and screen sharing — beautifully simple.
           </p>
@@ -107,40 +103,18 @@ export default function Authentication() {
           <div className="flex flex-col gap-3 mt-2">
             {features.map(({ icon, text }) => (
               <div key={text} className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-blue-400 shrink-0">
+                <span className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-[var(--primary-color)] shrink-0">
                   {icon}
                 </span>
-                <span className="text-sm text-gray-300 font-medium">
+                <span className="text-sm text-[var(--text-secondary)] font-medium">
                   {text}
                 </span>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Bottom: Testimonial */}
-        <div className="relative z-10">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-            <p className="text-gray-300 text-sm leading-relaxed italic">
-              "Vidora replaced three different tools for us. The experience is
-              seamless and our team actually enjoys meetings now."
-            </p>
-            <div className="flex items-center gap-3 mt-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4F84F6] to-[#5D58E0] flex items-center justify-center text-xs font-bold text-white">
-                R
-              </div>
-              <div>
-                <p className="text-white text-xs font-semibold">Rohit Sharma</p>
-                <p className="text-gray-500 text-xs">
-                  Head of Product, TechFlow
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* ── Right Panel — Form ── */}
       <div className="flex-1 bg-[#fafafa] flex flex-col justify-center items-center px-6 py-12">
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
@@ -267,7 +241,7 @@ export default function Authentication() {
           </div>
 
           {/* Switch form hint */}
-          <p className="text-center text-sm text-gray-400">
+          <p className="text-center text-sm text-[var(--text-secondary)]">
             {formState === 0
               ? "Don't have an account?"
               : "Already have an account?"}{" "}
@@ -283,15 +257,9 @@ export default function Authentication() {
           </p>
 
           {/* Footer note */}
-          <p className="text-center text-xs text-gray-300 -mt-3">
-            By continuing, you agree to Vidora's{" "}
-            <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
-              Terms
-            </span>{" "}
-            &amp;{" "}
-            <span className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
-              Privacy Policy
-            </span>
+          <p className="text-center text-xs text-[var(--text-secondary)] -mt-3">
+            &copy;
+            2026 Vidora. All rights reserved.
           </p>
         </div>
       </div>

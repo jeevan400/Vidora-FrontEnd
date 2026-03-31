@@ -20,8 +20,9 @@ import { nanoid } from "nanoid";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import server from "../environment";
 
-const server_url = import.meta.env.VITE_SERVER_URL;
+const server_url = server;
 
 let connections = {};
 
