@@ -1,7 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "../styles/videoComponent.module.css";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import io from "socket.io-client";
 import IconButton from "@mui/material/IconButton";
 import VideocamIcon from "@mui/icons-material/Videocam";
@@ -15,12 +13,18 @@ import Badge from "@mui/material/Badge";
 import ChatIcon from "@mui/icons-material/Chat";
 import vIcon from "../assets/vidoraImages/V_icon.png";
 import SendIcon from "@mui/icons-material/Send";
+import ReplyIcon from "@mui/icons-material/Reply";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { nanoid } from "nanoid";
+import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const server_url = import.meta.env.VITE_SERVER_URL;
 
 let connections = {};
 
-// STUN servers are lightweight servers running on the public internet which return the IP address of the requester's device
 const peerConfigConnections = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
@@ -28,30 +32,27 @@ const peerConfigConnections = {
 function VideoMeetComponent() {
   let socketRef = useRef();
   let socketIdRef = useRef();
-
   let localVideoRef = useRef();
-
+  const videoRef = useRef([]);
+  const messageEndRef = useRef(null);
   let [videoAvailable, setVideoAvailable] = useState(true);
-
   let [audioAvailable, setAudioAvailable] = useState(true);
-
   let [video, setVideo] = useState([]);
   let [audio, setAudio] = useState();
-
   let [screen, setScreen] = useState();
   let [showModal, setShowModal] = useState(false);
   let [screenAvailable, setScreenAvailable] = useState();
-
   let [messages, setMessages] = useState([]);
   let [message, setMessage] = useState("");
   let [newMessages, setNewMessages] = useState(0);
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
-
-  const videoRef = useRef([]);
-
   let [videos, setVideos] = useState([]);
-
+  let [sender, setSender] = useState();
+  let [contextMenu, setContextMenu] = useState();
+  let [reply, setReply] = useState(false);
+  let [replyData, setReplyData] = useState({});
+  let routeTo = useNavigate();
   const getPermissions = async () => {
     try {
       // video permission
@@ -78,6 +79,7 @@ function VideoMeetComponent() {
       }
 
       // display media
+      // check if screen sharing API (getDisplayMedia) is supported by the browser
       if (navigator.mediaDevices.getDisplayMedia) {
         setScreenAvailable(true);
       } else {
@@ -92,7 +94,6 @@ function VideoMeetComponent() {
 
         if (userMediaStream) {
           window.localStream = userMediaStream;
-
           if (localVideoRef.current) {
             localVideoRef.current.srcObject = userMediaStream;
           }
@@ -150,7 +151,7 @@ function VideoMeetComponent() {
             console.log(e);
           }
 
-          // TODO BlackSilence
+          // blackSilence
           let blackSilence = (...args) =>
             new MediaStream([black(...args), silence()]);
           window.localStream = blackSilence();
@@ -197,21 +198,19 @@ function VideoMeetComponent() {
     return Object.assign(stream.getVideoTracks()[0], { enabled: false });
   };
 
-  // if any changes in the audio and video then it run means when audio and video on or off then it is run
   // Function to start or stop user media ( camera / micraophone)
   let getUserMedia = () => {
-    // if the user wants video or audio AND the device supports it then start media stream
     if ((video && videoAvailable) || (audio && audioAvailable)) {
       navigator.mediaDevices
-        .getUserMedia({ video: video, audio: audio }) // Request camera and microphone permission from the browser
-        .then(getUserMediaSuccess) // Promise resolved when user allows permission
+        .getUserMedia({ video: video, audio: audio })
+        .then(getUserMediaSuccess)
         .then((stream) => {})
-        .catch((err) => console.log(err)); // Handle errors like permission denied or device not found
+        .catch((err) => console.log(err));
+      found;
     } else {
-      // if the user turns camera or mic OFF. stop all tracks from the current media stream
       try {
-        let tracks = localVideoRef.current.srcObject.getTracks(); // get all media tracks (video + audio)
-        tracks.forEach((track) => track.stop()); // stop each track
+        let tracks = localVideoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
       } catch (e) {
         console.log(e);
       }
@@ -225,33 +224,20 @@ function VideoMeetComponent() {
   }, [audio, video]);
 
   // Function that will handle signaling messages coming from the server
-  // These messages are used to establish webRTC connections (offer, answers, ICE candidates)
-  // This function is called whenever we receive a signaling message
-  // from the socket server (offer / answer/ ICE candidate)
   let gotMesssageFromServer = (fromId, message) => {
-    // Conver the incoming string message into a javaScript object
     let signal = JSON.parse(message);
-
-    // Ignore messages that come from our own socket
     if (fromId !== socketIdRef.current) {
-      // If the message contains SDP (offer or answer)
       if (signal.sdp) {
-        // Set the received SDP as the remote description
-        // This tells our peer connection what the other peer supports
         connections[fromId]
           .setRemoteDescription(new RTCSessionDescription(signal.sdp))
           .then(() => {
-            // If the received SDP type is "offer" then we need to generate an answer
             if (signal.sdp.type === "offer") {
-              // create an SDP answer
               connections[fromId]
                 .createAnswer()
                 .then((description) => {
-                  // set the genrated answer as the local description
                   connections[fromId]
                     .setLocalDescription(description)
                     .then(() => {
-                      // Send the answer back to the remote peer through the socket signaling server
                       socketRef.current.emit(
                         "signal",
                         fromId,
@@ -270,8 +256,6 @@ function VideoMeetComponent() {
 
       // if the message contains ICE candidate
       if (signal.ice) {
-        // Add the ICE candidate to the peer connection
-        // This helps in finding the best network route
         connections[fromId]
           .addIceCandidate(new RTCIceCandidate(signal.ice))
           .catch((e) => console.log(e));
@@ -279,14 +263,22 @@ function VideoMeetComponent() {
     }
   };
 
-  // Function that will add chat messages to the chat UI
-  // This runs whenever a chat message event is received
   let addMessage = (data, sender, socketIdSender) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: sender, data: data },
+      {
+        sender: sender,
+        replyTo: data.replyTo ? data.replyTo : null,
+        data: data.text,
+        currentUser: socketIdSender,
+        date: Date.now(),
+        msg_id: data.msg_id,
+      },
     ]);
 
+    if (socketIdSender === socketIdRef.current) {
+      setSender(socketIdSender);
+    }
     if (socketIdSender !== socketIdRef.current) {
       setNewMessages((prevMessages) => prevMessages + 1);
     }
@@ -294,47 +286,44 @@ function VideoMeetComponent() {
 
   // Function used to connect the client to the socket signaling server
   let connectToSocketServer = () => {
-    // Cstablish socket.io connection with the server
     socketRef.current = io.connect(server_url, { secure: false });
-
-    //Listen for signaling events from the server
-    // These signals contain WebRTC connection data
     socketRef.current.on("signal", gotMesssageFromServer);
-
-    // This runs when the socket connection is successfully established
     socketRef.current.on("connect", () => {
-      //Inform the server that this user wants to join a call room
-      // window.location.href is being used as the meeting room ID
+      toast.success("User connected successfully!");
       socketRef.current.emit("join-call", window.location.href);
-
-      // Store the current user's socket ID
       socketIdRef.current = socketRef.current.id;
-
-      // Listen for incoming chat messages from other users
       socketRef.current.on("chat-message", addMessage);
 
-      // Event triggered when a user leaves the meeting
-      socketRef.current.on("user-left", (id) => {
-        // Remove that user's video from the video list
-        setVideos((videos) => videos.filter((video) => video.socketId !== id));
+      // edit message on user B side
+      socketRef.current.on("edit-message", (data) => {
+        setMessages((prev) =>
+          prev.map((item) =>
+            item.msg_id === data.id ? { ...item, data: data.message } : item,
+          ),
+        );
+      });
+
+      // delete message
+      socketRef.current.on("delete-message", (id) => {
+        setMessages((prev) => prev.filter((item) => item.msg_id !== id));
+      });
+
+      // set limit of the user
+      socketRef.current.on("room-full", () => {
+        toast.error("Meeting is full.");
+        routeTo("/home");
       });
 
       // Event triggered when a new user joins the meeting
       socketRef.current.on("user-joined", (id, clients) => {
-        console.log("USER JOINED EVENT");
-        console.log("ID:", id);
-        console.log("CLIENTS:", clients);
-        // Create a new WebRTC peer connection for that user
         clients.forEach((socketListId) => {
           connections[socketListId] = new RTCPeerConnection(
             peerConfigConnections,
           );
 
           // Handle ICE candidate generation
-          // ICE candidates help find the best network path between users
           connections[socketListId].onicecandidate = (event) => {
             if (event.candidate !== null) {
-              // Send the ICE candidate to the other user through the socket server
               socketRef.current.emit(
                 "signal",
                 socketListId,
@@ -345,26 +334,21 @@ function VideoMeetComponent() {
 
           // Event triggered when a remote user stream is received
           connections[socketListId].onaddstream = (event) => {
-            // Check if this user's video already exists in the UI
             let videoExists = videoRef.current.find(
               (video) => video.socketId === socketListId,
             );
 
-            // if the video already exists
             if (videoExists) {
-              // Update the existing video stream
               setVideos((videos) => {
                 const updatedVideos = videos.map((video) =>
                   video.socketId === socketListId
                     ? { ...video, stream: event.stream }
                     : video,
                 );
-                // update refrence array
                 videoRef.current = updatedVideos;
                 return updatedVideos;
               });
             } else {
-              // If the video does not exist yet, create a new video object
               let newVideo = {
                 socketId: socketListId,
                 stream: event.stream,
@@ -383,14 +367,8 @@ function VideoMeetComponent() {
 
           // Check if local camera/microphone stream is available
           if (window.localStream !== undefined && window.localStream !== null) {
-            //Add local media stram to the peer connection
-            // This allows sending out camera/mic stram to the remote user
             connections[socketListId].addStream(window.localStream);
           } else {
-            //Black silence
-            // if no media stram is available
-            // we will send an empty (black/silent) stream
-
             let blackSilence = (...args) =>
               new MediaStream([black(...args), silence()]);
             window.localStream = blackSilence();
@@ -398,41 +376,39 @@ function VideoMeetComponent() {
           }
         });
 
-        // check if the current socket id belongs to this user
         if (id === socketIdRef.current) {
-          // Loop through all existing peer connections
           for (let id2 in connections) {
-            // Skip if the connection belongs to the current user
             if (id2 === socketIdRef.current) continue;
 
             try {
-              // Add local stream to the peer connection
-              // so the remote user can receive our video/ audio
               connections[id2].addStream(window.localStream);
             } catch (e) {
-              // log any error that occurs while adding stream
               console.log(e);
             }
 
-            // Create webRTC offer for starting the connection
             connections[id2].createOffer().then((description) => {
-              // Set the created offer as the local description
               connections[id2]
                 .setLocalDescription(description)
                 .then(() => {
-                  // Send the offer (SDP) to the remote peer through socket server
                   socketRef.current.emit(
                     "signal",
                     id2,
                     JSON.stringify({ sdp: connections[id2].localDescription }),
                   );
                 })
-                // Catch any error while setting local description
                 .catch((e) => console.log(e));
             });
           }
         }
       });
+    });
+
+    // Event triggered when a user leaves the meeting
+    socketRef.current.on("user-left", (id) => {
+      console.log("USER LEFT EVENT RECEIVED: ", id);
+      toast.success("User left the call!");
+      // Remove that user's video from the video list
+      setVideos((videos) => videos.filter((video) => video.socketId !== id));
     });
   };
 
@@ -536,67 +512,211 @@ function VideoMeetComponent() {
 
   let handleChatBox = () => {
     setShowModal(!showModal);
+    setNewMessages(0);
   };
 
   let sendMessage = () => {
-    socketRef.current.emit("chat-message", message, username);
+    const messageData = {
+      text: message,
+      replyTo: reply ? replyData : null,
+      msg_id: nanoid(),
+    };
+
+    socketRef.current.emit("chat-message", messageData, username);
+    setMessage("");
+    setReply(false);
+    setReplyData({});
+  };
+
+  let scrollToBottom = () => {
+    messageEndRef.current?.scrollIntoView({ behaviour: "smooth" });
+  };
+  useEffect(() => {
+    if (showModal) {
+      scrollToBottom();
+    }
+  }, [showModal]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [updatedMessage, setUpdatedMessage] = useState(null);
+  const [updatedMessageId, setUpdatedMessageId] = useState(null);
+  let handleStartEdit = (id) => {
+    setIsEdit(true);
+    const selectedMessage = messages.find((item) => item.msg_id === id);
+    // console.log(selectedMessage);
+    if (selectedMessage) {
+      setMessage(selectedMessage.data);
+      // console.log(selectedMessage.msg_id);
+      setUpdatedMessageId(selectedMessage.msg_id);
+    }
+  };
+  let handleUpdatMessage = () => {
+    // send to server
+    socketRef.current.emit("edit-message", {
+      id: updatedMessageId,
+      message: message,
+    });
+
+    //local update
+    setMessages((prev) =>
+      prev.map((item) =>
+        item.msg_id === updatedMessageId ? { ...item, data: message } : item,
+      ),
+    );
+    setIsEdit(false);
+    setUpdatedMessageId(null);
     setMessage("");
   };
+
+  // handle delete message
+  let handleDeleteMessage = (id) => {
+    console.log("message deleted successfully");
+    // setMessages(messages.filter((item) => id !== item.msg_id));
+    socketRef.current.emit("delete-message", {
+      id: id,
+      socketId: socketIdRef.current,
+    });
+  };
+
+  // handle reply
+  let handleReply = (id) => {
+    const selectedMessage = messages.find((item) => item.msg_id === id);
+
+    if (selectedMessage) {
+      setReplyData((prev) => ({
+        ...prev,
+        user: selectedMessage.sender,
+        data: selectedMessage.data,
+      }));
+      setReply(true);
+    }
+  };
+
+  let handleEndCall = () => {
+    try {
+      // stop camera + mic
+      if (localVideoRef.current?.srcObject) {
+        localVideoRef.current.srcObject
+          .getTracks()
+          .forEach((track) => track.stop());
+        localVideoRef.current.srcObject = null;
+      }
+
+      // stop global stream
+      if (window.localStream) {
+        window.localStream.getTracks().forEach((track) => track.stop());
+        window.localStream = null;
+      }
+
+      // Close all peer connections
+      for (let id in connections) {
+        connections[id]?.close();
+        delete connections[id];
+      }
+
+      // disconnect socket ( most important)
+      if (socketRef.current) {
+        socketRef.current.emit("leave-call", null, () => {
+          socketRef.current.disconnect();
+        });
+      }
+
+      toast.success("Call ended!");
+    } catch (e) {
+      console.log(e);
+      toast.error("Error ending call.");
+    }
+
+    setTimeout(() => {
+      routeTo("/home");
+    }, 300);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+      setReply(false);
+      setReplyData({});
+      setIsEdit(false);
+    }
+  };
+
+  // for mobile when user trigger long press
+  const [pressTimer, setPressTimer] = useState(null);
+
+  // to detect delay
+  const handleTouchStart = (item) => {
+    const timer = setTimeout(() => {
+      setContextMenu(item.msg_id);
+    }, 500);
+
+    setPressTimer(timer);
+  };
+  // to cancle if released early
+  const handleTouchEnd = () => {
+    clearTimeout(pressTimer);
+  };
+
   return (
-    <div>
+    <div onClick={() => setContextMenu(null)}>
       {askForUsername === true ? (
         <div className={styles.lobbyContainer}>
-          <div className={styles.lobbyForm}>
-            <div className={styles.formContent}>
-              <div className={styles.logoImage}>
-                <h1>Welcome to</h1>
-                <div className="flex justify-center items-center">
-                  <img src={vIcon} alt="logo" />
-                  <h1>idora</h1>
+          <div className="h-full flex-1 flex justify-center items-stretch">
+            <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-full rounded-lg p-[2px] flex justify-center items-center">
+              <div className="bg-white h-full w-full rounded-lg flex justify-center items-center">
+                <div className=" bg-white w-full rounded-lg flex flex-col justify-between items-center p-6">
+                  <div className={styles.logoImage}>
+                    <h1>Welcome to</h1>
+                    <div className="flex justify-center items-center">
+                      <img src={vIcon} alt="logo" />
+                      <h1>idora</h1>
+                    </div>
+                  </div>
+                  <input
+                    className="px-4 py-2 w-full rounded-lg border border-[var(--primary-color)] my-4 focus:ring-0 outline-none"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    type="text"
+                    placeholder="Enter your name"
+                  />
+                  <div className={styles.formMainContent}>
+                    <h2>Enter the Meeting Room</h2>
+                    <p>
+                      Join the meeting and start seamless communication in
+                      seconds.
+                    </p>
+                  </div>
+                  <button
+                    onClick={connect}
+                    className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] text-[18px] text-white font-semibold w-full  px-4 py-2 rounded-full hover:shadow-[4px_4px_10px_#0000003d] transition-all duration-300 ease-in"
+                  >
+                    CREATE A MEETING
+                  </button>
                 </div>
               </div>
-              <TextField
-                className={styles.formTextField}
-                id="filled-basic"
-                label="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                variant="filled"
-                sx={{
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "var(--primary-color)",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "1px solid var(--primary-color)",
-                  },
-                }}
-              />
-              <div className={styles.formMainContent}>
-                <h2>Enter the Meeting Room</h2>
-                <p>
-                  Join the meeting and start seamless communication in seconds.
-                </p>
-              </div>
             </div>
-            <Button
-              className={styles.lobbyFormButton}
-              variant="contained"
-              onClick={connect}
-            >
-              Connect
-            </Button>
           </div>
 
           <div className={styles.lobbyStream}>
-            <video ref={localVideoRef} autoPlay muted></video>
+            <video
+              className="border border-[var(--border-color)]"
+              ref={localVideoRef}
+              autoPlay
+              muted
+            ></video>
             <div className="w-[97%] h-[90%] absolute top-4 left-4 flex flex-col justify-start gap-2">
-              <div className="bg-[#4f46e54d] w-fit px-4 py-2 rounded-lg border border-indigo-500 shadow-[0_0_20px_#4f46e56d] text-white font-light  ">
+              <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-[60%] md:w-fit px-4 py-2 rounded-lg border border-white shadow-[0_0_20px_#4f46e56d] text-white font-light  ">
                 <h1 className="text-[16px] font-bold">Audio</h1>
                 <p className="text-[12px] font-light">
                   Clear and smooth voice communication.
                 </p>
               </div>
-              <div className="bg-[#4f46e54d] w-fit px-4 py-2 rounded-lg border border-indigo-500 shadow-[0_0_20px_#4f46e56d] text-white font-light ">
+              <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-[70%] md:w-fit px-4 py-2 rounded-lg border border-white shadow-[0_0_20px_#4f46e56d] text-white font-light ">
                 <h1 className="text-[16px] font-bold">Video</h1>
                 <p className="text-[12px] font-light">
                   Connect face-to-face with live video.
@@ -604,18 +724,18 @@ function VideoMeetComponent() {
               </div>
               <div className="absolute top-4 right-6">
                 <img
-                  className="h-8 w-8 rounded-full border border-indigo-500"
+                  className="h-8 w-8 rounded-full border border-white"
                   src={vIcon}
                   alt="logo"
                 />
               </div>
-              <div className="w-fit px-4 py-2 bg-[#4f46e54d] rounded-lg text-white  border border-indigo-500 shadow-[0_0_20px_#4f46e56d]">
+              <div className=" w-[60%] md:w-fit px-4 py-2 bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] rounded-lg text-white  border border-white shadow-[0_0_20px_#4f46e56d]">
                 <h1 className="text-[16px] font-bold">Chat</h1>
                 <p className="text-[12px] font-light">
                   Send quick messages during the meeting
                 </p>
               </div>
-              <div className="w-fit px-4 py-2 bg-[#4f46e54d] rounded-lg text-white border border-indigo-500 shadow-[0_0_20px_#4f46e56d]">
+              <div className="w-[80%] md:w-fit px-4 py-2 bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] rounded-lg text-white border border-white shadow-[0_0_20px_#4f46e56d]">
                 <h1 className="text-[16px] font-bold">Screen Share</h1>
                 <p className="text-[12px] font-light">
                   Share your screen for easy collaboration.
@@ -633,11 +753,9 @@ function VideoMeetComponent() {
             autoPlay
             muted
           ></video>
-          {/* {styles.conferenceView} */}
           <div className={styles.conferenceView}>
             {videos.map((video) => (
               <video
-                // {styles.conferenceUsers}
                 key={video.socketId}
                 className={styles.conferenceUsers}
                 data-socket={video.socketId}
@@ -651,7 +769,7 @@ function VideoMeetComponent() {
             ))}
           </div>
           <div className={styles.buttonContainer}>
-            <div className="bg-white/20 px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-4">
+            <div className="bg-white/20 px-4 sm:px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-2 sm:gap-4">
               <IconButton onClick={handleVideo}>
                 {video === true ? (
                   <VideocamIcon style={{ color: "var(--primary-hover)" }} />
@@ -659,7 +777,7 @@ function VideoMeetComponent() {
                   <VideocamoffIcon />
                 )}
               </IconButton>
-              <IconButton>
+              <IconButton onClick={handleEndCall}>
                 <CallEndIcon style={{ color: "red" }} />
               </IconButton>
               <IconButton onClick={handleAudio}>
@@ -704,34 +822,185 @@ function VideoMeetComponent() {
               <div className={styles.chatBox}>
                 {messages.length > 0 ? (
                   messages.map((item, index) => {
-                    return (
-                      <div className="w-fit bg-[var(--primary-color)] px-4 py-2 rounded-tl-[30px] rounded-tr-[30px] rounded-br-[30px] rounded-bl-[10px]" key={index}>
-                        <p className="text-[16px] text-[#ffffff] font-extrabold ">{item.sender}</p>
-                        <p className="text-[14px] text-[#ffffff] font-medium">{item.data}</p>
+                    return item.currentUser === sender ? (
+                      <div
+                        onContextMenu={(e) => {
+                          e.preventDefault(); // remove default browser contextMenu
+                          setContextMenu(item.msg_id);
+                        }}
+                        onTouchStart={() => handleTouchStart(item)}
+                        onTouchEnd={handleTouchEnd}
+                        className="relative w-full flex justify-end items-center gap-2"
+                        key={item.msg_id}
+                      >
+                        {contextMenu === item.msg_id ? (
+                          <div className="w-fit rounded-lg bg-[var(--light-primary)] flex flex-col justify-between items-center">
+                            <div
+                              onClick={() => handleStartEdit(item.msg_id)}
+                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] rounded-tl-lg rounded-tr-lg text-[14px] py-1 px-2 hover:text-white"
+                            >
+                              <EditIcon style={{ fontSize: "16px" }} />
+                              &nbsp;Edit
+                            </div>
+                            <div
+                              onClick={() => handleDeleteMessage(item.msg_id)}
+                              className=" w-full flex-1 hover:bg-red-100 flex justify-start items-center rounded-bl-lg rounded-br-lg cursor-pointer transition-all duration-300 ease-in hover:text-[var(--error-color)] text-[var(--error-color)] text-[14px] py-1 px-2"
+                            >
+                              <DeleteIcon style={{ fontSize: "16px" }} />
+                              &nbsp;Delete
+                            </div>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+                        <div
+                          className="max-w-[90%] bg-[var(--active-speaker)] px-4 py-2 rounded-tl-[20px] rounded-tr-[30px] rounded-br-[5px] rounded-bl-[20px] break-words"
+                          key={index}
+                        >
+                          {item.replyTo?.user && item.replyTo?.data && (
+                            <div className="bg-white/20 px-2 py-1 rounded mb-1 border-l-4 border-white">
+                              <p className="text-[10px] font-bold text-white">
+                                {item.replyTo.user}
+                              </p>
+                              <p className="text-[10px] text-white truncate">
+                                {item.replyTo.data}
+                              </p>
+                            </div>
+                          )}
+                          <p className="text-[14px] text-[var(--light-primary)] font-extrabold truncate">
+                            {item.sender}
+                          </p>
+                          <p className="text-[12px] text-[var(--light-primary)] font-medium">
+                            {item.data}
+                          </p>
+                          <p className="text-[8px] text-[var(--light-primary)] text-right font-semibold">
+                            {new Date(item.date).toLocaleTimeString("en-IN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        onContextMenu={(e) => {
+                          e.preventDefault(); // remove default browser contextMenu
+                          setContextMenu(item.msg_id);
+                        }}
+                        onTouchStart={() => handleTouchStart(item)}
+                        onTouchEnd={handleTouchEnd}
+                        className="w-full flex justify-start items-center gap-2 group"
+                        key={item.msg_id}
+                      >
+                        <div className="max-w-[90%] bg-[var(--light-primary)] px-4 py-2 rounded-tl-[30px] rounded-tr-[20px] rounded-br-[20px] rounded-bl-[5px] break-words">
+                          {item.replyTo?.user && item.replyTo?.data && (
+                            <div className="bg-white/50 px-2 py-1 rounded mb-1 border-l-4 border-[var(--primary-color)]">
+                              <p className="text-[10px] font-bold text-[var(--primary-color)]">
+                                {item.replyTo.user}
+                              </p>
+                              <p className="text-[10px] text-[var(--primary-color)] truncate">
+                                {item.replyTo.data}
+                              </p>
+                            </div>
+                          )}
+                          <p className="text-[14px] text-[var(--text-primary)] font-extrabold truncate">
+                            {item.sender}
+                          </p>
+                          <p className="text-[12px] text-[var(--text-secondary)] font-medium">
+                            {item.data}
+                          </p>
+                          <p className="text-[8px] text-[var(--text-secondary)] text-right font-semibold">
+                            {new Date(item.date).toLocaleTimeString("en-IN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                        {contextMenu === item.msg_id ? (
+                          <div className=" w-fit rounded-lg bg-[var(--light-primary)] flex flex-col justify-between items-center">
+                            <div
+                              onClick={() => handleReply(item.msg_id)}
+                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center rounded-tl-lg rounded-tr-lg cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] text-[14px] py-1 px-2 hover:text-white"
+                            >
+                              <ReplyIcon style={{ fontSize: "16px" }} />
+                              &nbsp;Reply
+                            </div>
+                            <div
+                              onClick={() => handleDeleteMessage(item.msg_id)}
+                              className=" w-full flex-1 hover:bg-red-100 flex justify-start items-center rounded-bl-lg rounded-br-lg cursor-pointer transition-all duration-300 ease-in hover:text-[var(--error-color)] text-[var(--error-color)] text-[14px] py-1 px-2"
+                            >
+                              <DeleteIcon style={{ fontSize: "16px" }} />
+                              &nbsp;Delete
+                            </div>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </div>
                     );
                   })
                 ) : (
-                  <div className="">No messages Yet.</div>
+                  <div className="bg-[var(--light-primary)] text-[14px] font-medium w-fit m-auto px-4 py-2 rounded-lg">
+                    No messages Yet.
+                  </div>
                 )}
+                <div ref={messageEndRef}></div>
               </div>
               <div className={styles.chatInput}>
-                <input
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  type="text"
-                />
-                <IconButton
-                  onClick={sendMessage}
-                  style={{
-                    backgroundColor: "var(--primary-hover)",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SendIcon style={{ color: "white" }} />
-                </IconButton>
+                <div className="flex-1 flex flex-col rounded-lg border border-l-4 border-[var(--primary-color)]">
+                  {reply && (
+                    <div className="flex-1 px-4 py-1 rounded-tl-lg rounded-tr-lg flex justify-between items-center">
+                      <div>
+                        <h1 className="text-[14px] font-bold text-[var(--text-primary)]">
+                          {replyData.user}
+                        </h1>
+                        <p className="text-[12px] font-light text-[var(--text-secondary)] line-clamp-1">
+                          {replyData.data}
+                        </p>
+                      </div>
+                      <div
+                        onClick={() => setReply(false)}
+                        className="w-fit h-fit flex justify-center items-center text-[var(--error-color)] cursor-pointer hover:bg-red-100 p-1 border border-[var(--error-color)] rounded-full transition-all duration-300  ease-in"
+                      >
+                        <CloseIcon style={{ fontSize: "14px" }} />
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    placeholder="Messages . . ."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    type="text"
+                    onKeyDown={handleKeyDown}
+                  />
+                </div>
+                <div className="h-full flex justify-center items-end">
+                  {isEdit ? (
+                    <IconButton
+                      onClick={handleUpdatMessage}
+                      style={{
+                        backgroundColor: "var(--primary-hover)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <EditIcon style={{ color: "white" }} />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={sendMessage}
+                      style={{
+                        backgroundColor: "var(--primary-hover)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <SendIcon style={{ color: "white" }} />
+                    </IconButton>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
