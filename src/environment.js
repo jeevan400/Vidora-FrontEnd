@@ -1,5 +1,5 @@
 let IS_PROD = true;
 
-const server = IS_PROD ? `${import.meta.env.VITE_SERVER_URL}`:`http://localhost:8000`
+const server = IS_PROD ? `https://vidora-backend-1.onrender.com`:`http://localhost:8000`
 
 export default server;
