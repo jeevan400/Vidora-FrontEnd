@@ -96,7 +96,9 @@ function History() {
 
                   {/* <!-- Buttons --> */}
                   <div className="flex gap-2">
-                    <button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-md transition">
+                    <button onClick={()=>{
+                      routeTo(`/${meet.meetingCode}`)
+                    }} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-md transition">
                       Join
                     </button>
                     <button
