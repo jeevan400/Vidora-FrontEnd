@@ -205,13 +205,6 @@ function LandingPage() {
                 Get Started — it&apos;s free
                 <ArrowRight size={15} />
               </Link>
-
-              <button
-                onClick={handleLogin}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-gray-700 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-200"
-              >
-                Log in
-              </button>
             </div>
           </div>
 
