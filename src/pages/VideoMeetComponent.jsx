@@ -653,35 +653,41 @@ function VideoMeetComponent() {
       {askForUsername === true ? (
         <div className={styles.lobbyContainer}>
           <div className="h-full flex-1 flex justify-center items-stretch">
-            <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-full rounded-lg p-[2px] flex justify-center items-center">
-              <div className="bg-white h-full w-full rounded-lg flex justify-center items-center">
-                <div className=" bg-white w-full rounded-lg flex flex-col justify-between items-center p-6">
+            <div className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] w-full rounded-lg p-[2px] flex justify-center items-center">
+              <div className="bg-[var(--background-color)] h-full w-full rounded-lg flex justify-center items-center">
+                <div className=" bg-[var(--background-color)] w-full rounded-lg flex flex-col justify-between items-center p-6">
                   <div className={styles.logoImage}>
-                    <h1>Welcome to</h1>
+                    <h1 className="!text-3xl md:!text-4xl !font-extrabold text-[var(--text-primary)] leading-tight tracking-tight">
+                      Welcome to
+                    </h1>
                     <div className="flex justify-center items-center">
                       <img src={vIcon} alt="logo" />
-                      <h1>idora</h1>
+                      <h1 className="!text-3xl md:!text-4xl !font-extrabold bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] bg-clip-text text-transparent leading-tight tracking-tight">
+                        idora
+                      </h1>
                     </div>
                   </div>
                   <input
-                    className="px-4 py-2 w-full rounded-lg border border-[var(--primary-color)] my-4 focus:ring-0 outline-none"
+                    className="!font-sans px-4 py-2 w-full rounded-lg border border-[var(--gradient-end)] my-4 focus:ring-0 outline-none !text-sm"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
                     placeholder="Enter your name"
                   />
                   <div className={styles.formMainContent}>
-                    <h2>Enter the Meeting Room</h2>
-                    <p>
+                    <h2 className="!text-lg !font-sans font-semibold">
+                      Enter the Meeting Room
+                    </h2>
+                    <p className="text-sm !font-sans !font-medium !text-[var(--text-secondary)]">
                       Join the meeting and start seamless communication in
                       seconds.
                     </p>
                   </div>
                   <button
                     onClick={connect}
-                    className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] text-[18px] text-white font-semibold w-full  px-4 py-2 rounded-full hover:shadow-[4px_4px_10px_#0000003d] transition-all duration-300 ease-in"
+                    className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] hover:from-[var(--gradient-end)] hover:to-[var(--gradient-start)] text-sm font-semibold text-[var(--background-color)]  font-semibold w-full  px-4 py-2 rounded-full shadow-lg transition-all duration-300 ease-in"
                   >
-                    CREATE A MEETING
+                    Create a Meeting
                   </button>
                 </div>
               </div>
@@ -696,13 +702,13 @@ function VideoMeetComponent() {
               muted
             ></video>
             <div className="w-[97%] h-[90%] absolute top-4 left-4 flex flex-col justify-start gap-2">
-              <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-[60%] md:w-fit px-4 py-2 rounded-lg border border-white shadow-[0_0_20px_#4f46e56d] text-white font-light  ">
+              <div className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] w-[60%] md:w-fit px-4 py-2 rounded-lg border border-[var(--background-color)] shadow-[0_0_20px_#4f46e56d] text-[var(--background-color)] font-light  ">
                 <h1 className="text-[16px] font-bold">Audio</h1>
                 <p className="text-[12px] font-light">
                   Clear and smooth voice communication.
                 </p>
               </div>
-              <div className="bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] w-[70%] md:w-fit px-4 py-2 rounded-lg border border-white shadow-[0_0_20px_#4f46e56d] text-white font-light ">
+              <div className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] w-[70%] md:w-fit px-4 py-2 rounded-lg border border-[var(--background-color)] shadow-[0_0_20px_#4f46e56d] text-[var(--background-color)] font-light ">
                 <h1 className="text-[16px] font-bold">Video</h1>
                 <p className="text-[12px] font-light">
                   Connect face-to-face with live video.
@@ -710,18 +716,18 @@ function VideoMeetComponent() {
               </div>
               <div className="absolute top-4 right-6">
                 <img
-                  className="h-8 w-8 rounded-full border border-white"
+                  className="h-8 w-8 rounded-full border border-[var(--background-color)]"
                   src={vIcon}
                   alt="logo"
                 />
               </div>
-              <div className=" w-[60%] md:w-fit px-4 py-2 bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] rounded-lg text-white  border border-white shadow-[0_0_20px_#4f46e56d]">
+              <div className=" w-[60%] md:w-fit px-4 py-2 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] rounded-lg text-[var(--background-color)]  border border-[var(--background-color)] shadow-[0_0_20px_#4f46e56d]">
                 <h1 className="text-[16px] font-bold">Chat</h1>
                 <p className="text-[12px] font-light">
                   Send quick messages during the meeting
                 </p>
               </div>
-              <div className="w-[80%] md:w-fit px-4 py-2 bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] rounded-lg text-white border border-white shadow-[0_0_20px_#4f46e56d]">
+              <div className="w-[80%] md:w-fit px-4 py-2 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] rounded-lg text-[var(--background-color)] border border-[var(--background-color)] shadow-[0_0_20px_#4f46e56d]">
                 <h1 className="text-[16px] font-bold">Screen Share</h1>
                 <p className="text-[12px] font-light">
                   Share your screen for easy collaboration.
@@ -755,7 +761,7 @@ function VideoMeetComponent() {
             ))}
           </div>
           <div className={styles.buttonContainer}>
-            <div className="bg-white/20 px-4 sm:px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-2 sm:gap-4">
+            <div className="bg-[var(--background-color)]/20 px-4 sm:px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-2 sm:gap-4">
               <IconButton onClick={handleVideo}>
                 {video === true ? (
                   <VideocamIcon style={{ color: "var(--primary-hover)" }} />
@@ -799,7 +805,7 @@ function VideoMeetComponent() {
           </div>
           {showModal ? (
             <div className={styles.chatRoom}>
-              <h1 className="flex justify-center items-center bg-white w-fit px-4 py-1 rounded-full">
+              <h1 className="flex justify-center items-center bg-[var(--background-color)] w-fit px-4 py-1 rounded-full">
                 <img className="h-8 w-8 rounded-full" src={vIcon} alt="logo" />
                 <span className="text-[18px] text-[#060606] font-bold">
                   idora Chat
@@ -823,7 +829,7 @@ function VideoMeetComponent() {
                           <div className="w-fit rounded-lg bg-[var(--light-primary)] flex flex-col justify-between items-center">
                             <div
                               onClick={() => handleStartEdit(item.msg_id)}
-                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] rounded-tl-lg rounded-tr-lg text-[14px] py-1 px-2 hover:text-white"
+                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] rounded-tl-lg rounded-tr-lg text-[14px] py-1 px-2 hover:text-[var(--background-color)]"
                             >
                               <EditIcon style={{ fontSize: "16px" }} />
                               &nbsp;Edit
@@ -844,11 +850,11 @@ function VideoMeetComponent() {
                           key={index}
                         >
                           {item.replyTo?.user && item.replyTo?.data && (
-                            <div className="bg-white/20 px-2 py-1 rounded mb-1 border-l-4 border-white">
-                              <p className="text-[10px] font-bold text-white">
+                            <div className="bg-[var(--background-color)]/20 px-2 py-1 rounded mb-1 border-l-4 border-[var(--background-color)]">
+                              <p className="text-[10px] font-bold text-[var(--background-color)]">
                                 {item.replyTo.user}
                               </p>
-                              <p className="text-[10px] text-white truncate">
+                              <p className="text-[10px] text-[var(--background-color)] truncate">
                                 {item.replyTo.data}
                               </p>
                             </div>
@@ -880,7 +886,7 @@ function VideoMeetComponent() {
                       >
                         <div className="max-w-[90%] bg-[var(--light-primary)] px-4 py-2 rounded-tl-[30px] rounded-tr-[20px] rounded-br-[20px] rounded-bl-[5px] break-words">
                           {item.replyTo?.user && item.replyTo?.data && (
-                            <div className="bg-white/50 px-2 py-1 rounded mb-1 border-l-4 border-[var(--primary-color)]">
+                            <div className="bg-[var(--background-color)]/50 px-2 py-1 rounded mb-1 border-l-4 border-[var(--primary-color)]">
                               <p className="text-[10px] font-bold text-[var(--primary-color)]">
                                 {item.replyTo.user}
                               </p>
@@ -906,7 +912,7 @@ function VideoMeetComponent() {
                           <div className=" w-fit rounded-lg bg-[var(--light-primary)] flex flex-col justify-between items-center">
                             <div
                               onClick={() => handleReply(item.msg_id)}
-                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center rounded-tl-lg rounded-tr-lg cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] text-[14px] py-1 px-2 hover:text-white"
+                              className="w-full flex-1 hover:bg-[var(--active-speaker)] flex justify-start items-center rounded-tl-lg rounded-tr-lg cursor-pointer transition-all duration-300 ease-in text-[var(--active-speaker)] text-[14px] py-1 px-2 hover:text-[var(--background-color)]"
                             >
                               <ReplyIcon style={{ fontSize: "16px" }} />
                               &nbsp;Reply
@@ -971,7 +977,9 @@ function VideoMeetComponent() {
                         alignItems: "center",
                       }}
                     >
-                      <EditIcon style={{ color: "white" }} />
+                      <EditIcon
+                        style={{ color: "[var(--background-color)]" }}
+                      />
                     </IconButton>
                   ) : (
                     <IconButton
@@ -983,7 +991,9 @@ function VideoMeetComponent() {
                         alignItems: "center",
                       }}
                     >
-                      <SendIcon style={{ color: "white" }} />
+                      <SendIcon
+                        style={{ color: "[var(--background-color)]" }}
+                      />
                     </IconButton>
                   )}
                 </div>

@@ -1,8 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 
 body {
   font-family: "DM Sans", sans-serif;
-}
+} */
 
 :root {
   --primary-color: #6366f1;
@@ -16,6 +16,8 @@ body {
   --error-color: #ef4444;
   --success-color: #10b981;
   --active-speaker: #818cf8;
+  --gradient-start: #3B82F6;
+  --gradient-end: #9333EA;
 }
 
 .landingPageContainer2 {

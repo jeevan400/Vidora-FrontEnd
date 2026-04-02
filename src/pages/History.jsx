@@ -1,16 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import "../App.css";
-import LogoImage from "../assets/vidoraImages/vidoraMainLogo.png";
+import Navbar from "../components/Navbar";
+import NavMenu from "../components/NavMenu";
 
 function History() {
   const { getHistoryOfUser, deleteMeetingHistory } = useContext(AuthContext);
 
   const [meetings, setMeetings] = useState([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const routeTo = useNavigate();
 
@@ -33,22 +34,29 @@ function History() {
       prevMeetings.filter((meet) => meet._id !== id),
     );
   };
+
+  const navtabs = [
+    {
+      icon: (
+        <HomeIcon
+          style={{ color: "var(--text-secondary)", fontSize: "17px" }}
+        />
+      ),
+      text: "Home",
+      onClick: () => {
+        routeTo("/home");
+      },
+      className: "",
+    },
+  ];
   return (
     <div className="flex flex-col justify-center bg-gray-100">
-      <nav className=" bg-white shadow-[0_4px_40px_0px_#0000004d] h-[60px] flex justify-between items-center px-4 mb-6 sticky top-0 z-10">
-        <div className="navHeader">
-          <img className="h-[50px]" src={LogoImage} alt="" />
-        </div>
-        <div className="navlist">
-          <IconButton
-            onClick={() => {
-              routeTo("/home");
-            }}
-          >
-            <HomeIcon style={{ color: "black" }} />
-          </IconButton>
-        </div>
-      </nav>
+      <Navbar navtabs={navtabs} setIsMenuOpen={setIsMenuOpen} />
+
+      {isMenuOpen && (
+        <NavMenu navtabs={navtabs} setIsMenuOpen={setIsMenuOpen} />
+      )}
+
       {meetings.map((meet) => {
         return (
           <>
@@ -56,15 +64,15 @@ function History() {
               key={meet._id}
               className="flex justify-center items-center bg-gray-100 px-4 pb-4"
             >
-              <div className="relative w-full rounded-2xl p-[2px] bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300">
-                <div className="bg-white rounded-2xl p-5 shadow-lg">
+              <div className="relative w-full rounded-2xl p-[2px] bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] transition-all duration-300">
+                <div className="bg-[var(--background-color)] rounded-2xl p-5 shadow-lg">
                   {/* <!-- Header --> */}
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold text-gray-800 !text-[var(--primary-color)] flex justify-center items-center gap-2">
                       <VideocamIcon style={{ fontSize: "32px" }} />{" "}
                       <span>Meeting</span>
                     </h2>
-                    <span className="text-xs px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-semibold">
+                    <span className="text-xs px-3 py-1 bg-[var(--light-primary)] text-[var(--gradient-start)] rounded-full font-semibold">
                       Completed
                     </span>
                   </div>
@@ -96,9 +104,12 @@ function History() {
 
                   {/* <!-- Buttons --> */}
                   <div className="flex gap-2">
-                    <button onClick={()=>{
-                      routeTo(`/${meet.meetingCode}`)
-                    }} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-md transition">
+                    <button
+                      onClick={() => {
+                        routeTo(`/${meet.meetingCode}`);
+                      }}
+                      className="flex-1 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] hover:from-[var(--gradient-end)] hover:to-[var(--gradient-start)] text-[var(--background-color)] py-2 rounded-lg text-sm font-semibold hover:shadow-md transition"
+                    >
                       Join
                     </button>
                     <button

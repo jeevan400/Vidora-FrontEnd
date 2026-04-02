@@ -88,7 +88,7 @@ export default function Authentication() {
         <div className="relative z-10 flex flex-col gap-6">
           <h2 className="text-4xl font-extrabold text-[var(--text-primary)] leading-[1.2] tracking-tight">
             Meet, connect, and{" "}
-            <span className="bg-gradient-to-r from-[#4F84F6] to-[#a78bfa] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] bg-clip-text text-transparent">
               collaborate
             </span>{" "}
             without limits.
@@ -103,7 +103,7 @@ export default function Authentication() {
           <div className="flex flex-col gap-3 mt-2">
             {features.map(({ icon, text }) => (
               <div key={text} className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-[var(--primary-color)] shrink-0">
+                <span className="w-7 h-7 rounded-lg bg-[var(--background-color)] flex items-center justify-center text-[var(--primary-color)] shrink-0">
                   {icon}
                 </span>
                 <span className="text-sm text-[var(--text-secondary)] font-medium">
@@ -115,7 +115,7 @@ export default function Authentication() {
         </div>
       </div>
 
-      <div className="flex-1 bg-[#fafafa] flex flex-col justify-center items-center px-6 py-12">
+      <div className="flex-1 bg-[var(--surface-color)] flex flex-col justify-center items-center px-6 py-12">
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
           <img src={LogoImage} alt="Vidora" className="h-[34px]" />
@@ -124,10 +124,10 @@ export default function Authentication() {
         <div className="w-full max-w-[400px] flex flex-col gap-7">
           {/* Heading */}
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-extrabold text-[var(--text-primary)] tracking-tight">
               {formState === 0 ? "Welcome back" : "Create your account"}
             </h1>
-            <p className="text-gray-500 text-sm mt-1.5">
+            <p className="text-[var(--text-secondary)] text-sm mt-1.5">
               {formState === 0
                 ? "Sign in to continue to Vidora"
                 : "Get started for free — no credit card required"}
@@ -135,7 +135,7 @@ export default function Authentication() {
           </div>
 
           {/* Toggle tabs */}
-          <div className="flex bg-gray-100 rounded-xl p-1">
+          <div className="flex bg-[var(--light-primary)] rounded-xl p-1">
             <button
               onClick={() => {
                 setFormState(0);
@@ -143,8 +143,8 @@ export default function Authentication() {
               }}
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 formState === 0
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-[var(--background-color)] text-[var(--text-primary)] shadow-sm"
+                  : "text-[var(--text-secondary)] hover:text-[var(--tex-primaryt)]"
               }`}
             >
               Sign In
@@ -156,8 +156,8 @@ export default function Authentication() {
               }}
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 formState === 1
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-[var(--background-color)] text-[var(--text-primary)] shadow-sm"
+                  : "text-[var(--text-secondary)] hover:text-[var(--tex-primaryt)]"
               }`}
             >
               Sign Up
@@ -178,7 +178,7 @@ export default function Authentication() {
                   value={name}
                   autoFocus
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 bg-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--text-primary)] placeholder-gray-400 bg-[var(--background-color)] outline-none focus:border-[var(--gradient-end)] focus:ring-0  transition-all duration-150"
                 />
               </div>
             )}
@@ -195,7 +195,7 @@ export default function Authentication() {
                 autoFocus={formState === 0}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 bg-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--text-primary)] placeholder-gray-400 bg-[var(--background-color)] outline-none focus:border-[var(--gradient-end)] focus:ring-0  transition-all duration-150"
               />
             </div>
 
@@ -206,7 +206,7 @@ export default function Authentication() {
                   Password
                 </label>
                 {formState === 0 && (
-                  <span className="text-xs text-blue-500 hover:text-blue-600 cursor-pointer font-medium">
+                  <span className="text-xs text-[var(--primary-color)] hover:text-[var(--primary-hover)] cursor-pointer font-medium">
                     Forgot password?
                   </span>
                 )}
@@ -217,15 +217,17 @@ export default function Authentication() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 bg-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[var(--text-primary)] placeholder-gray-400 bg-[var(--background-color)] outline-none focus:border-[var(--gradient-end)] focus:ring-0  transition-all duration-150"
               />
             </div>
 
             {/* Error message */}
             {error && (
               <div className="flex items-center gap-2 px-3.5 py-2.5 bg-red-50 border border-red-100 rounded-xl">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <p className="text-xs font-medium text-red-600">{error}</p>
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--error-color)] shrink-0" />
+                <p className="text-xs font-medium text-[var(--error-color)]">
+                  {error}
+                </p>
               </div>
             )}
 
@@ -233,7 +235,7 @@ export default function Authentication() {
             <button
               type="button"
               onClick={handleAuth}
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-[#4F84F6] to-[#5D58E0] hover:from-[#3d74e8] hover:to-[#4a44d0] shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-[1px] mt-1"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-[var(--background-color)] rounded-xl bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] hover:from-[var(--gradient-end)] hover:to-[var(--gradient-start)] shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-[1px] mt-1"
             >
               {formState === 0 ? "Sign in to Vidora" : "Create Account"}
               <ArrowRight size={15} />
@@ -250,7 +252,7 @@ export default function Authentication() {
                 setFormState(formState === 0 ? 1 : 0);
                 setError("");
               }}
-              className="text-blue-500 font-semibold hover:text-blue-600 transition-colors"
+              className="text-[var(--primary-color)] hover:text-[var(--primary-hover)] font-semibold transition-colors"
             >
               {formState === 0 ? "Sign up free" : "Sign in"}
             </button>
@@ -258,8 +260,7 @@ export default function Authentication() {
 
           {/* Footer note */}
           <p className="text-center text-xs text-[var(--text-secondary)] -mt-3">
-            &copy;
-            2026 Vidora. All rights reserved.
+            &copy; 2026 Vidora. All rights reserved.
           </p>
         </div>
       </div>
