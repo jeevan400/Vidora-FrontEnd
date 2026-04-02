@@ -108,14 +108,14 @@ function Home() {
               Create a Meeting
               <ArrowRight size={15} />
             </button>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-gray-100" />
               <span className="text-xs text-gray-400">or</span>
               <div className="flex-1 h-px bg-gray-100" />
-            </div>
-            <button className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-gray-700 rounded-xl border border-gray-200 bg-[var(--background-color)] hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-150">
+            </div> */}
+            {/* <button className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-gray-700 rounded-xl border border-gray-200 bg-[var(--background-color)] hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all duration-150">
               Join with a Code
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="hidden md:flex w-full lg:flex-1 justify-center lg:justify-end items-center">

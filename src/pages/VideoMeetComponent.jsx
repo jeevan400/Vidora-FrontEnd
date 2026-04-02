@@ -960,6 +960,7 @@ function VideoMeetComponent() {
                   )}
                   <input
                     placeholder="Messages . . ."
+                    className="flex-1"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     type="text"
@@ -978,7 +979,7 @@ function VideoMeetComponent() {
                       }}
                     >
                       <EditIcon
-                        style={{ color: "[var(--background-color)]" }}
+                        style={{ color: "var(--background-color)" }}
                       />
                     </IconButton>
                   ) : (
@@ -992,7 +993,7 @@ function VideoMeetComponent() {
                       }}
                     >
                       <SendIcon
-                        style={{ color: "[var(--background-color)]" }}
+                        style={{ color: "var(--background-color)" }}
                       />
                     </IconButton>
                   )}

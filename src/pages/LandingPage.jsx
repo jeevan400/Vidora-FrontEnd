@@ -36,7 +36,7 @@ function LandingPage() {
       className: "",
     },
     {
-      icon: <LoginIcon style={{ fontSize: "17px" }} />,
+      icon: <LoginIcon style={{ fontSize: "17px", color:"var(--gradient-start)" }} />,
       text: "Log in",
       onClick: handleLogin,
       className:

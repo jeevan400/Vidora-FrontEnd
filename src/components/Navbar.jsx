@@ -3,15 +3,21 @@ import { Menu } from "lucide-react";
 import "../App.css";
 import LogoImage from "../assets/vidoraImages/vidoraMainLogo.png";
 import NavbarTab from "./NavbarTab";
+import { useNavigate } from "react-router-dom";
 
 function Navbar({ navtabs, setIsMenuOpen }) {
+  const navigate = useNavigate();
   const handleMenuOpen = () => {
     setIsMenuOpen(true);
   };
   return (
     <nav className="sticky top-0 z-50 bg-[var(--background-color)] border-b border-gray-200/80">
       <div className="max-w-6xl mx-auto px-5 h-[62px] flex items-center justify-between">
-        <div className="flex items-center">
+        <div 
+        onClick={()=>{
+          navigate('/');
+        }}
+         className="flex items-center cursor-pointer">
           <img className="h-[38px]" src={LogoImage} alt="Vidora logo" />
         </div>
         <div className="hidden md:flex items-center gap-1.5">

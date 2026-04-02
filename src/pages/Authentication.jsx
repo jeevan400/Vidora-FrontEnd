@@ -67,14 +67,11 @@ export default function Authentication() {
 
   return (
     <div className="min-h-screen flex font-sans">
-      {/* ── Left Panel — Brand ── */}
       <div className="hidden lg:flex w-[52%] relative flex-col justify-between p-12 overflow-hidden bg-[var(--light-primary)]">
-        {/* Gradient blobs */}
         <div className="absolute top-[-80px] left-[-60px] w-[340px] h-[340px] rounded-full bg-[#4F84F6]/20 blur-[90px] pointer-events-none" />
         <div className="absolute bottom-[-60px] right-[-40px] w-[280px] h-[280px] rounded-full bg-[#4F84F6]/20 blur-[80px] pointer-events-none" />
         <div className="absolute top-[45%] right-[10%] w-[180px] h-[180px] rounded-full bg-[#a78bfa]/10 blur-[60px] pointer-events-none" />
 
-        {/* Subtle grid overlay */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{
@@ -84,7 +81,6 @@ export default function Authentication() {
           }}
         />
 
-        {/* Middle: Headline */}
         <div className="relative z-10 flex flex-col gap-6">
           <h2 className="text-4xl font-extrabold text-[var(--text-primary)] leading-[1.2] tracking-tight">
             Meet, connect, and{" "}
@@ -116,13 +112,15 @@ export default function Authentication() {
       </div>
 
       <div className="flex-1 bg-[var(--surface-color)] flex flex-col justify-center items-center px-6 py-12">
-        {/* Mobile logo */}
-        <div className="lg:hidden mb-8">
+        <div 
+        onClick={()=>{
+          router('/');
+        }}
+         className="lg:hidden mb-8 cursor-pointer">
           <img src={LogoImage} alt="Vidora" className="h-[34px]" />
         </div>
 
         <div className="w-full max-w-[400px] flex flex-col gap-7">
-          {/* Heading */}
           <div>
             <h1 className="text-2xl font-extrabold text-[var(--text-primary)] tracking-tight">
               {formState === 0 ? "Welcome back" : "Create your account"}
