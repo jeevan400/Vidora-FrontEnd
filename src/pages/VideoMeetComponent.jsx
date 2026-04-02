@@ -657,35 +657,35 @@ function VideoMeetComponent() {
               <div className="bg-[var(--background-color)] h-full w-full rounded-lg flex justify-center items-center">
                 <div className=" bg-[var(--background-color)] w-full rounded-lg flex flex-col justify-between items-center p-6">
                   <div className={styles.logoImage}>
-                    <h1 className="!text-3xl md:!text-4xl !font-extrabold text-[var(--text-primary)] leading-tight tracking-tight">
+                    <h1 className="!text-3xl md:!text-4xl font-extrabold text-[var(--text-primary)] leading-tight tracking-tight">
                       Welcome to
                     </h1>
                     <div className="flex justify-center items-center">
                       <img src={vIcon} alt="logo" />
-                      <h1 className="!text-3xl md:!text-4xl !font-extrabold bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] bg-clip-text text-transparent leading-tight tracking-tight">
+                      <h1 className="!text-3xl md:!text-4xl bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] bg-clip-text text-transparent">
                         idora
                       </h1>
                     </div>
                   </div>
                   <input
-                    className="!font-sans px-4 py-2 w-full rounded-lg border border-[var(--gradient-end)] my-4 focus:ring-0 outline-none !text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-[var(--gradient-end)] focus:ring-0 focus:ring-blue-100 transition-all duration-150 my-4"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
                     placeholder="Enter your name"
                   />
                   <div className={styles.formMainContent}>
-                    <h2 className="!text-lg !font-sans font-semibold">
+                    <h2 className="block text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wide">
                       Enter the Meeting Room
                     </h2>
-                    <p className="text-sm !font-sans !font-medium !text-[var(--text-secondary)]">
+                    <p className="text-[var(--text-secondary)] text-xs fontsem mt-2 leading-relaxed">
                       Join the meeting and start seamless communication in
                       seconds.
                     </p>
                   </div>
                   <button
                     onClick={connect}
-                    className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] hover:from-[var(--gradient-end)] hover:to-[var(--gradient-start)] text-sm font-semibold text-[var(--background-color)]  font-semibold w-full  px-4 py-2 rounded-full shadow-lg transition-all duration-300 ease-in"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-[var(--background-color)] rounded-xl bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] hover:from-[var(--gradient-end)] hover:to-[var(--gradient-start)] shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-[1px]"
                   >
                     Create a Meeting
                   </button>

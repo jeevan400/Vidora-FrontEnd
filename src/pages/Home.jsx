@@ -91,11 +91,11 @@ function Home() {
           {/* Card */}
           <div className="bg-[var(--background-color)] rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
                 Meeting Name or Code
               </label>
               <input
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-150"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-[var(--gradient-end)] focus:ring-0 focus:ring-blue-100 transition-all duration-150"
                 type="text"
                 onChange={(e) => setMeetingCode(e.target.value)}
                 placeholder="e.g. team-standup or abc-defg-hij"
