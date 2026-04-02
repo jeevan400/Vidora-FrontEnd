@@ -21,6 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import server from "../environment";
+import { X } from "lucide-react";
 
 const server_url = server;
 
@@ -761,7 +762,7 @@ function VideoMeetComponent() {
             ))}
           </div>
           <div className={styles.buttonContainer}>
-            <div className="bg-[var(--background-color)]/20 px-4 sm:px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-2 sm:gap-4">
+            <div className="bg-[var(--background-color)]/20 px-4 sm:px-6 py-2 rounded-full border border-[var(--border-color)] shadow-lg flex justify-between items-center gap-2 sm:gap-4 flex-wrap">
               <IconButton onClick={handleVideo}>
                 {video === true ? (
                   <VideocamIcon style={{ color: "var(--primary-hover)" }} />
@@ -805,11 +806,19 @@ function VideoMeetComponent() {
           </div>
           {showModal ? (
             <div className={styles.chatRoom}>
-              <h1 className="flex justify-center items-center bg-[var(--background-color)] w-fit px-4 py-1 rounded-full">
-                <img className="h-8 w-8 rounded-full" src={vIcon} alt="logo" />
-                <span className="text-[18px] text-[#060606] font-bold">
-                  idora Chat
-                </span>
+              <h1 className="w-full flex justify-between items-center bg-[var(--background-color)] w-fit px-4 py-1 rounded-full">
+                <div className="flex justify-center items-center">
+                  <img className="h-8 w-8 rounded-full" src={vIcon} alt="logo" />
+                  <span className="text-[18px] text-[#060606] font-bold">
+                    idora Chat
+                  </span>
+                </div>
+                <div 
+                onClick={()=>setShowModal(false)}
+                className="w-fit h-fit p-[5px] rounded-md flex justify-center items-center hover:bg-gray-200 transition-all duration-200 ease-in text-[var(--text-primary)] cursor-pointer"
+                >
+                <X size={18}/>
+              </div>
               </h1>
               <div className={styles.chatBox}>
                 {messages.length > 0 ? (
